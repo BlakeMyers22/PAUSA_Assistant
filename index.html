@@ -98,7 +98,7 @@
                 <!-- Claim Information -->
                 <div class="space-y-4">
                     <h2 class="text-xl font-semibold">Claim Information</h2>
-
+                
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Claim Type</label>
                         <select id="claimType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
@@ -110,18 +110,24 @@
                             <option value="other">Other</option>
                         </select>
                     </div>
-
+                
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Date of Loss (When damage was discovered)</label>
                         <input type="date" id="dateOfLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
-
+                
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Causation Date (When the cause occurred, if different)</label>
+                        <input type="date" id="causationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        <p class="text-sm text-gray-500 mt-1">Leave blank if same as Date of Loss</p>
+                    </div>
+                
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Property Location</label>
                         <input type="text" id="location" placeholder="Full address including city, state, and ZIP" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
                 </div>
-
+                
                 <!-- Damage Assessment -->
                 <div class="space-y-4">
                     <h2 class="text-xl font-semibold">Damage Assessment</h2>
@@ -155,6 +161,13 @@
                             </div>
                         </div>
                     </div>
+                
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Engineer Notes</label>
+                        <textarea id="engineerNotes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" 
+                                placeholder="Enter your engineering observations, measurements, and technical specifications."></textarea>
+                    </div>
+                </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Engineer Notes</label>
