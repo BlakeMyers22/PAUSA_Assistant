@@ -329,12 +329,12 @@
             squareFootage: document.getElementById('squareFootage').value,
             claimType: document.getElementById('claimType').value,
             dateOfLoss: document.getElementById('dateOfLoss').value,
+            causationDate: document.getElementById('causationDate').value || document.getElementById('dateOfLoss').value, // Use dateOfLoss if causationDate is empty
             location: document.getElementById('location').value,
             affectedAreas: getCheckedItems(['roof', 'siding', 'windows', 'gutters', 'foundation', 'interior']),
-            engineerNotes: document.getElementById('engineerNotes').value,
-            moistureFindings: document.getElementById('moistureFindings').value
+            engineerNotes: document.getElementById('engineerNotes').value
         };
-
+    
         // Hide form and start section generation
         document.getElementById('claimForm').parentElement.classList.add('hidden');
         document.getElementById('sectionProgress').classList.remove('hidden');
