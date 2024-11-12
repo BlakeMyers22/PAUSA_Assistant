@@ -47,70 +47,49 @@ async function getWeatherData(location, date) {
   }
 }
 
-// Function to generate section content
-async function generateSection(sectionName, context, weatherData) {
+// Function to generate section content with section-specific prompts
+async function generateSection(sectionName, context, weatherData, customInstructions = '') {
   const sectionPrompts = {
-    'authorization': `You are writing the "Authorization and Scope of Investigation" section for a forensic engineering report. Use this format but vary the wording:
+    'authorization': `You are writing the "Authorization and Scope of Investigation" section for a forensic engineering report. Follow this format but vary the wording:
 
-Background: 
+Background:
 - Investigation Date: ${context.investigationDate}
 - Property Address: ${context.location}
 - Client: ${context.clientName}
 - Date of Loss: ${context.dateOfLoss}
+- Claimed Cause: ${context.claimType}
 
 Required Elements:
 1. State the site investigation details (date, location, requestor)
-2. Explain the purpose (evaluate ${context.claimType} damage from the reported date of loss)
+2. Explain the purpose (evaluate ${context.claimType} damage from reported date of loss)
 3. Detail the scope of investigation (photo documentation, analysis, etc.)
-4. Mention the appendices: 
+4. Mention appendices that will be included:
    - Inspection Photo Report (Appendix A)
    - Roof Moisture Survey (Appendix B)
    - Meteorologist Report (Appendix C)
 5. Reference any third-party reports reviewed
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'background': `You are writing the "Background Information" section for a forensic engineering report. Use this format but vary the wording:
+Format this similarly to: "A site investigation was completed by North Star Forensics (NSF), LLC on [date]..." but use your own professional engineering language.`,
 
-Property Details:
+    'background': `You are writing the "Background Information" section for a forensic engineering report. Include these details:
+
+Property Information:
 - Type: ${context.propertyType}
 - Age: ${context.propertyAge} years
 - Construction: ${context.constructionType}
 - Current Use: ${context.currentUse}
-- Square Footage: ${context.squareFootage || 'To be determined'}
+- Square Footage: ${context.squareFootage}
 
 Required Elements:
-1. Describe the building's construction type and materials
-2. Detail the roof system and exterior finish
-3. Include relevant architectural features
-4. Note the building's current use and year built
-5. Mention any relevant historical information
+1. Describe building construction and materials
+2. Detail architectural features and systems
+3. Note current use and year built
+4. Include square footage and layout details
+5. Describe roof system and exterior finishes
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'conclusions': `You are writing the "Conclusion and Recommendations" section for a forensic engineering report. Use this format but vary the wording:
+Use professional engineering language while maintaining accuracy and detail.`,
 
-Case Details:
-- Damage Type: ${context.claimType}
-- Weather Data: ${JSON.stringify(weatherData)}
-- Affected Areas: ${context.affectedAreas.join(', ')}
-- Investigation Findings: ${context.engineerNotes}
-
-Required Elements:
-1. List main conclusions as bullet points addressing:
-   - Storm event impact and date
-   - Weather data correlation
-   - Physical evidence of damage
-   - Supporting meteorological data
-   - Moisture survey findings
-2. Provide specific recommendations as bullet points for:
-   - Required repairs/replacements
-   - Scope of work needed
-   - Additional considerations
-
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'observations': `You are writing the "Site Observations and Analysis" section for a forensic engineering report. Use this format but vary the wording:
+    'observations': `You are writing the "Site Observations and Analysis" section for a forensic engineering report. Include:
 
 Investigation Areas:
 - Components: ${context.affectedAreas.join(', ')}
@@ -119,100 +98,124 @@ Investigation Areas:
 
 Required Elements:
 1. Initial methodology statement
-2. Organize observations by component area:
-   - Roof covering (if applicable)
-   - Exterior components (if applicable)
-   - Interior damage (if applicable)
+2. Organize by component areas:
+   ${context.affectedAreas.map(area => `- ${area} investigation details`).join('\n   ')}
 3. For each component:
    - Detailed observations
    - Analysis of damage patterns
    - Correlation with reported cause
 4. Reference photo documentation (Appendix A)
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'moisture': `You are writing the "Roof Moisture Survey" section for a forensic engineering report. Use this format but vary the wording:
+Write in a professional engineering style, similar to the sample format but with unique phrasing.`,
+
+    'moisture': `You are writing the "Roof Moisture Survey" section for a forensic engineering report. Include:
 
 Survey Details:
-- Date: ${context.investigationDate}
-- Equipment Used: Professional moisture detection tools
-- Findings: ${context.moistureFindings || 'Detailed moisture analysis pending'}
+- Investigation Date: ${context.investigationDate}
+- Property Type: ${context.propertyType}
+- Roof Type: Based on property description
 
-Required Elements:
-1. Describe survey methodology
-2. Detail equipment used
-3. Summarize findings
-4. Reference full report in Appendix B
-5. Note any significant moisture patterns or concerns
+Key Elements:
+1. Survey methodology
+2. Equipment used (standard moisture detection tools)
+3. Findings overview
+4. Reference to detailed results in Appendix B
+5. Significance of findings
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'meteorologist': `You are writing the "Meteorologist Report" section for a forensic engineering report. Use this format but vary the wording:
+Write professionally, noting that full details are in Appendix B.`,
+
+    'meteorologist': `You are writing the "Meteorologist Report" section for a forensic engineering report. Include:
 
 Weather Data:
 ${JSON.stringify(weatherData, null, 2)}
 Date of Loss: ${context.dateOfLoss}
 
 Required Elements:
-1. Summarize weather data analysis
-2. Detail specific conditions:
-   - Wind speeds
-   - Hail occurrence
-   - Precipitation
-3. Correlate weather data with observed damage
-4. Reference full report in Appendix C
+1. Weather data analysis
+2. Specific conditions:
+   - Wind speeds and patterns
+   - Precipitation levels
+   - Temperature variations
+   - Storm characteristics
+3. Correlation with reported damage
+4. Reference to full report in Appendix C
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'rebuttal': `You are writing the "Rebuttal" section for a forensic engineering report. Use this format but vary the wording:
+Write professionally, focusing on weather impact on observed damage.`,
 
-Dispute Details:
-- Third Party Report Date: ${context.thirdPartyReportDate || 'N/A'}
-- Key Disputes: ${context.keyDisputes || 'Standard analysis disputes'}
-- Our Investigation Date: ${context.investigationDate}
+    'conclusions': `You are writing the "Conclusion and Recommendations" section for a forensic engineering report. Include:
+
+Analysis Basis:
+- Damage Type: ${context.claimType}
+- Weather Data: ${JSON.stringify(weatherData)}
+- Affected Areas: ${context.affectedAreas.join(', ')}
+- Investigation Findings: ${context.engineerNotes}
 
 Required Elements:
-1. Reference the third-party report
-2. Address key points of disagreement
-3. Provide technical justification for our positions
-4. Reference supporting evidence
-5. Maintain professional tone
+1. Main conclusions as bullet points:
+   - Storm event impact and date
+   - Weather correlation
+   - Physical evidence
+   - Supporting data
+2. Specific recommendations:
+   - Required repairs/replacements
+   - Scope of work
+   - Additional considerations
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`,
-    
-    'limitations': `You are writing the "Limitations" section for a forensic engineering report. Use this format but vary the wording:
+Follow the bullet-point format of the sample but use unique professional language.`,
+
+    'rebuttal': `You are writing the "Rebuttal" section for a forensic engineering report. Include:
+
+Context:
+- Our Date of Loss: ${context.dateOfLoss}
+- Our Investigation Date: ${context.investigationDate}
+- Our Findings: Based on gathered evidence
+
+Required Elements:
+1. Reference to third-party reports
+2. Professional disagreement points
+3. Technical justification
+4. Evidence references
+5. Professional tone
+
+Maintain professional disagreement while supporting positions with evidence.`,
+
+    'limitations': `You are writing the "Limitations" section for a forensic engineering report. Include standard but uniquely worded:
 
 Required Elements:
 1. Scope limitations
-2. Information available at time of report
-3. Scientific and engineering certainty statement
-4. Conditions present during examination
+2. Information availability statement
+3. Scientific/engineering certainty statement
+4. Examination conditions
 5. Confidentiality statement
 6. Additional study disclaimer
 7. Report use restrictions
 
-Write in a professional engineering tone. Avoid exact copying of the sample text but maintain a similar structure and level of detail.`
+Follow professional standards while varying language from the sample.`
   };
+
+  const basePrompt = sectionPrompts[sectionName.toLowerCase()];
+  const finalPrompt = customInstructions 
+    ? `${basePrompt}\n\nAdditional Instructions: ${customInstructions}\n\nModify the section according to these instructions while maintaining professional engineering standards.`
+    : basePrompt;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4',
     messages: [
       {
         role: 'system',
-        content: `You are an expert forensic engineer with extensive experience in property damage assessment and report writing. Generate professional, detailed report sections that maintain consistency with engineering standards while varying language and presentation.
-
-Guidelines:
-1. Use formal, technical language appropriate for engineering reports
-2. Include specific details from the provided context
-3. Maintain logical flow and clear organization
-4. Support conclusions with observed evidence
-5. Reference appropriate documentation and appendices
-6. Avoid copying exact phrases from sample text
-7. Ensure completeness of required elements`
+        content: `You are an expert forensic engineer generating professional report sections. Guidelines:
+1. Use formal, technical language
+2. Include specific context details
+3. Maintain logical flow
+4. Support conclusions with evidence
+5. Reference documentation appropriately
+6. Use unique phrasing
+7. Ensure completeness
+8. Incorporate custom instructions while maintaining standards`
       },
       {
         role: 'user',
-        content: sectionPrompts[sectionName.toLowerCase()]
+        content: finalPrompt
       }
     ],
     temperature: 0.7,
@@ -238,7 +241,7 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const { section, context } = JSON.parse(event.body);
+    const { section, context, customInstructions } = JSON.parse(event.body);
     
     // Format date for weather API
     const formattedDate = new Date(context.dateOfLoss).toISOString().split('T')[0];
@@ -247,7 +250,12 @@ exports.handler = async function(event, context) {
     const weatherResult = await getWeatherData(context.location, formattedDate);
     
     // Generate the requested section
-    const sectionContent = await generateSection(section, context, weatherResult.data);
+    const sectionContent = await generateSection(
+      section, 
+      context, 
+      weatherResult.data,
+      customInstructions
+    );
 
     return {
       statusCode: 200,
