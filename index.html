@@ -53,10 +53,121 @@
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <form id="claimForm" class="space-y-6">
                 <!-- Basic Information -->
-                [Previous form fields remain the same up to damage assessment section...]
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Basic Information</h2>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Investigation Date</label>
+                        <input type="date" id="investigationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Client Name</label>
+                        <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Property Type</label>
+                        <select id="propertyType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Property Age (Years)</label>
+                        <input type="number" id="propertyAge" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Construction Type</label>
+                        <input type="text" id="constructionType" placeholder="e.g., Steel frame with brick veneer" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Current Use</label>
+                        <input type="text" id="currentUse" placeholder="e.g., Commercial office space" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Square Footage</label>
+                        <input type="number" id="squareFootage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+                </div>
+
+                <!-- Claim Information -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Claim Information</h2>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Claim Type</label>
+                        <select id="claimType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <option value="hail">Hail Damage</option>
+                            <option value="wind">Wind Damage</option>
+                            <option value="water">Water Damage</option>
+                            <option value="fire">Fire Damage</option>
+                            <option value="structural">Structural Damage</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Date of Loss (When damage was discovered)</label>
+                        <input type="date" id="dateOfLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Causation Date (When the cause occurred, if different)</label>
+                        <input type="date" id="causationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        <p class="text-sm text-gray-500 mt-1">Leave blank if same as Date of Loss</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Property Location</label>
+                        <input type="text" id="location" placeholder="Full address including city, state, and ZIP" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+                </div>
 
                 <!-- Damage Assessment -->
-                [Previous damage assessment section remains the same...]
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Damage Assessment</h2>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Affected Areas</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <input type="checkbox" id="roof" class="rounded">
+                                <label for="roof" class="ml-2">Roof</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="siding" class="rounded">
+                                <label for="siding" class="ml-2">Siding</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="windows" class="rounded">
+                                <label for="windows" class="ml-2">Windows</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="gutters" class="rounded">
+                                <label for="gutters" class="ml-2">Gutters</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="foundation" class="rounded">
+                                <label for="foundation" class="ml-2">Foundation</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="interior" class="rounded">
+                                <label for="interior" class="ml-2">Interior</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Engineer Notes</label>
+                        <textarea id="engineerNotes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" 
+                                placeholder="Enter your engineering observations, measurements, and technical specifications."></textarea>
+                    </div>
+                </div>
 
                 <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
                     Begin Report Generation
@@ -69,8 +180,36 @@
             <h2 class="text-xl font-semibold mb-4">Report Generation Progress</h2>
             <div class="space-y-2">
                 <div class="flex items-center space-x-2">
-                    <div class="w-4 h-4 rounded-full" id="progress-authorization"></div>
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-authorization"></div>
                     <span>Authorization and Scope</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-background"></div>
+                    <span>Background Information</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-observations"></div>
+                    <span>Site Observations and Analysis</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-moisture"></div>
+                    <span>Roof Moisture Survey</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-meteorologist"></div>
+                    <span>Meteorologist Report</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-conclusions"></div>
+                    <span>Conclusions and Recommendations</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-rebuttal"></div>
+                    <span>Rebuttal</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-gray-200" id="progress-limitations"></div>
+                    <span>Limitations</span>
                 </div>
             </div>
         </div>
@@ -88,7 +227,7 @@
                 <button id="acceptSection" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">
                     Accept and Continue
                 </button>
-                <div class="relative">
+                <div class="relative inline-block">
                     <button id="rateSection" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
                         Rate This Section
                     </button>
@@ -106,7 +245,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="ratingMessage" class="hidden mt-2 text-sm text-green-600">
                 Rating submitted!
             </div>
@@ -194,7 +333,7 @@
         function toggleRegenerationDialog(show) {
             document.getElementById('regenerationDialog').classList.toggle('hidden', !show);
             if (show) {
-                document.getElementById('regenerationInstructions').value = '';
+                document.getElementById('regenerationInstructions').value = ''; // Clear previous instructions
             }
         }
 
@@ -202,6 +341,15 @@
         function getCheckedItems(items) {
             return items.filter(item => document.getElementById(item).checked)
                        .map(item => document.getElementById(item).nextElementSibling.textContent.trim());
+        }
+
+        // Function to update section progress
+        function updateProgress(sectionId, status) {
+            const progressIndicator = document.getElementById(`progress-${sectionId}`);
+            if (progressIndicator) {
+                progressIndicator.classList.remove('bg-gray-200', 'bg-green-500', 'bg-red-500');
+                progressIndicator.classList.add(status === 'complete' ? 'bg-green-500' : status === 'error' ? 'bg-red-500' : 'bg-gray-200');
+            }
         }
 
         // Function to generate a section
@@ -222,9 +370,11 @@
                 if (!response.ok) throw new Error('Failed to generate section');
                 
                 const data = await response.json();
+                updateProgress(sectionId, 'complete');
                 return data.section;
             } catch (error) {
                 console.error('Error:', error);
+                updateProgress(sectionId, 'error');
                 throw error;
             } finally {
                 toggleLoading(false);
@@ -284,36 +434,11 @@
                 generatedSections[reportSections[0].id] = content;
                 updateSectionPreview(reportSections[0].id, content);
             } catch (error) {
-                console.error('Failed to generate initial section:', error);
                 alert('Failed to generate initial section. Please try again.');
             }
         });
 
-        // Regenerate section button handler
-        document.getElementById('regenerateSection').addEventListener('click', () => {
-            toggleRegenerationDialog(true);
-        });
-
-        // Dialog button handlers
-        document.getElementById('cancelRegeneration').addEventListener('click', () => {
-            toggleRegenerationDialog(false);
-        });
-
-        document.getElementById('confirmRegeneration').addEventListener('click', async () => {
-            const instructions = document.getElementById('regenerationInstructions').value.trim();
-            toggleRegenerationDialog(false);
-            
-            try {
-                const currentSection = reportSections[currentSectionIndex];
-                const content = await generateSection(currentSection.id, instructions);
-                generatedSections[currentSection.id] = content;
-                updateSectionPreview(currentSection.id, content);
-            } catch (error) {
-                alert('Failed to regenerate section. Please try again.');
-            }
-        });
-
-        // Rating functionality
+        // Rating handlers
         document.getElementById('rateSection').addEventListener('click', () => {
             const popup = document.getElementById('ratingPopup');
             popup.classList.toggle('hidden');
@@ -338,13 +463,12 @@
                 // Hide popup after selection
                 document.getElementById('ratingPopup').classList.add('hidden');
                 
-                // Store rating (you can modify this to send to your backend)
                 const currentSection = reportSections[currentSectionIndex];
                 console.log(`Section ${currentSection.id} rated: ${rating}/7`);
             });
         });
 
-        // Hide rating popup when clicking outside
+        // Handle rating popup close
         document.addEventListener('click', (e) => {
             const popup = document.getElementById('ratingPopup');
             const rateButton = document.getElementById('rateSection');
@@ -354,25 +478,38 @@
             }
         });
 
-        // Accept section button handler
-        document.getElementById('acceptSection').addEventListener('click', async () => {
-            // Reset rating UI for next section
-            currentSectionRating = 0;
-            document.querySelectorAll('.rating-button').forEach(btn => {
-                btn.classList.remove('bg-blue-500', 'text-white');
-            });
-            document.getElementById('ratingMessage').classList.add('hidden');
-            document.getElementById('ratingPopup').classList.add('hidden');
+        // Regeneration dialog handlers
+        document.getElementById('regenerateSection').addEventListener('click', () => {
+            toggleRegenerationDialog(true);
+        });
+
+        document.getElementById('cancelRegeneration').addEventListener('click', () => {
+            toggleRegenerationDialog(false);
+        });
+
+        document.getElementById('confirmRegeneration').addEventListener('click', async () => {
+            const instructions = document.getElementById('regenerationInstructions').value.trim();
+            toggleRegenerationDialog(false);
             
+            try {
+                const currentSection = reportSections[currentSectionIndex];
+                const content = await generateSection(currentSection.id, instructions);
+                generatedSections[currentSection.id] = content;
+                updateSectionPreview(currentSection.id, content);
+            } catch (error) {
+                alert('Failed to regenerate section. Please try again.');
+            }
+        });
+
+        // Accept section handler
+        document.getElementById('acceptSection').addEventListener('click', async () => {
             currentSectionIndex++;
             
             if (currentSectionIndex >= reportSections.length) {
-                // All sections complete, show final report
                 compileFinalReport();
                 return;
             }
 
-            // Generate next section
             try {
                 const nextSection = reportSections[currentSectionIndex];
                 const content = await generateSection(nextSection.id);
@@ -380,7 +517,7 @@
                 updateSectionPreview(nextSection.id, content);
             } catch (error) {
                 alert('Failed to generate next section. Please try again.');
-                currentSectionIndex--; // Revert index on error
+                currentSectionIndex--;
             }
         });
 
@@ -398,7 +535,7 @@
             document.body.removeChild(a);
         });
 
-        // Add escape key handler to close dialog
+        // Escape key handler
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 toggleRegenerationDialog(false);
@@ -406,5 +543,5 @@
             }
         });
     </script>
-    </body>
-    </html>
+</body>
+</html>
