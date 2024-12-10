@@ -200,6 +200,27 @@
                 <button id="acceptSection" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">
                     Accept and Continue
                 </button>
+                <div class="relative">
+                    <button id="rateSection" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        Rate This Section
+                    </button>
+                    <div id="ratingPopup" class="hidden absolute bottom-12 left-0 bg-white p-4 rounded-lg shadow-lg border w-64">
+                        <p class="text-sm text-gray-600 mb-2">Rate this section (1-7):</p>
+                        <div class="flex space-x-2">
+                            {[1,2,3,4,5,6,7].map(num => `
+                                <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        data-rating="${num}">
+                                    ${num}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add this right after the above div -->
+            <div id="ratingMessage" class="hidden mt-2 text-sm text-green-600">
+                Rating submitted!
             </div>
 
             <!-- Regeneration Dialog -->
