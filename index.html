@@ -293,7 +293,9 @@
         let currentSectionIndex = 0;
         let generatedSections = {};
         let formContext = {};
-    
+        let currentSectionRating = 0;
+
+
         // Utility function to show/hide loading indicator
         function toggleLoading(show, message = 'Generating report section...') {
             const loader = document.getElementById('loadingIndicator');
@@ -425,6 +427,14 @@
     
         // Accept section button handler
         document.getElementById('acceptSection').addEventListener('click', async () => {
+            // Reset rating UI for next section
+            currentSectionRating = 0;
+            document.querySelectorAll('.rating-button').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+            });
+            document.getElementById('ratingMessage').classList.add('hidden');
+            document.getElementById('ratingPopup').classList.add('hidden');
+            
             currentSectionIndex++;
             
             if (currentSectionIndex >= reportSections.length) {
@@ -442,6 +452,51 @@
             } catch (error) {
                 alert('Failed to generate next section. Please try again.');
                 currentSectionIndex--; // Revert index on error
+            }
+        });
+        
+        // Rating functionality
+        let currentSectionRating = 0;
+
+        // Toggle rating popup
+        document.getElementById('rateSection').addEventListener('click', () => {
+            const popup = document.getElementById('ratingPopup');
+            popup.classList.toggle('hidden');
+        });
+
+        // Handle rating selection
+        document.querySelectorAll('.rating-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const rating = parseInt(button.dataset.rating);
+                currentSectionRating = rating;
+                
+                // Update button styles
+                document.querySelectorAll('.rating-button').forEach(btn => {
+                    btn.classList.remove('bg-blue-500', 'text-white');
+                });
+                button.classList.add('bg-blue-500', 'text-white');
+                
+                // Show message
+                const message = document.getElementById('ratingMessage');
+                message.textContent = `Rating of ${rating}/7 submitted!`;
+                message.classList.remove('hidden');
+                
+                // Hide popup after selection
+                document.getElementById('ratingPopup').classList.add('hidden');
+                
+                // Store rating (you can modify this to send to your backend)
+                const currentSection = reportSections[currentSectionIndex];
+                console.log(`Section ${currentSection.id} rated: ${rating}/7`);
+            });
+        });
+
+        // Hide rating popup when clicking outside
+        document.addEventListener('click', (e) => {
+            const popup = document.getElementById('ratingPopup');
+            const rateButton = document.getElementById('rateSection');
+            
+            if (!popup.contains(e.target) && !rateButton.contains(e.target)) {
+                popup.classList.add('hidden');
             }
         });
     
@@ -463,6 +518,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 toggleRegenerationDialog(false);
+                document.getElementById('ratingPopup').classList.add('hidden');
             }
         });
     </script>
