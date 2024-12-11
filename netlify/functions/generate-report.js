@@ -245,7 +245,7 @@ Required Elements:
 3. Detail the scope of investigation (photo documentation, analysis, etc.)
 4. Mention appendices that will be included:
    - Inspection Photo Report (Appendix A)
-   - Roof Moisture Survey (Appendix B)
+   - Survey (Appendix B)
    - Meteorologist Report (Appendix C)
 5. Reference any third-party reports reviewed
 
@@ -288,7 +288,7 @@ Required Elements:
 
 Write in a professional engineering style, similar to the sample format but with unique phrasing.`,
 
-    'moisture': `You are writing the "Roof Moisture Survey" section for a forensic engineering report. Include:
+    'moisture': `You are writing the "Survey" section for a forensic engineering report. Include:
 
 Survey Details:
 - Investigation Date: ${context.investigationDate}
