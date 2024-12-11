@@ -43,12 +43,16 @@
             padding-left: 1rem;
             margin-bottom: 1rem;
         }
+        .rating-button.selected {
+            background-color: #3b82f6;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-center mb-8">North Star Forensic Engineers (NSFE)</h1>
-        
+
         <!-- Main Form -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <form id="claimForm" class="space-y-6">
@@ -214,6 +218,7 @@
             </div>
         </div>
 
+
         <!-- Current Section Review -->
         <div id="sectionReview" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4">Review Current Section</h2>
@@ -231,9 +236,9 @@
                     <button id="rateSection" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
                         Rate This Section
                     </button>
-                    <div id="ratingPopup" class="hidden absolute bottom-12 left-0 bg-white p-4 rounded-lg shadow-lg border w-64">
+                    <div id="ratingPopup" class="hidden absolute bottom-12 left-0 bg-white p-4 rounded-lg shadow-lg border w-96">
                         <p class="text-sm text-gray-600 mb-2">Rate this section (1-7):</p>
-                        <div class="flex space-x-2">
+                        <div class="flex space-x-2 mb-4">
                             <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="1">1</button>
                             <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="2">2</button>
                             <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="3">3</button>
@@ -242,10 +247,26 @@
                             <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="6">6</button>
                             <button class="rating-button w-8 h-8 rounded-full border border-gray-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-rating="7">7</button>
                         </div>
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-600 mb-2">Feedback (minimum 10 words):</label>
+                            <textarea 
+                                id="ratingFeedback" 
+                                class="w-full p-2 border rounded-md"
+                                rows="3"
+                                placeholder="Please provide your feedback on this section..."
+                            ></textarea>
+                            <p id="wordCount" class="text-xs text-gray-500 mt-1">0 words</p>
+                        </div>
+                        <button 
+                            id="submitRating" 
+                            class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            disabled
+                        >
+                            Submit Rating
+                        </button>
                     </div>
                 </div>
             </div>
-
             <div id="ratingMessage" class="hidden mt-2 text-sm text-green-600">
                 Rating submitted!
             </div>
@@ -320,7 +341,18 @@
         let currentSectionIndex = 0;
         let generatedSections = {};
         let formContext = {};
-        let currentSectionRating = 0;
+
+        // Function to reset rating UI
+        function resetRatingUI() {
+            document.getElementById('ratingFeedback').value = '';
+            document.getElementById('wordCount').textContent = '0 words';
+            document.querySelectorAll('.rating-button').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+            });
+            document.getElementById('submitRating').disabled = true;
+            document.getElementById('ratingMessage').classList.add('hidden');
+            document.getElementById('ratingPopup').classList.add('hidden');
+        }
 
         // Utility function to show/hide loading indicator
         function toggleLoading(show, message = 'Generating report section...') {
@@ -407,7 +439,6 @@
         document.getElementById('claimForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Gather form data into context
             formContext = {
                 investigationDate: document.getElementById('investigationDate').value,
                 clientName: document.getElementById('clientName').value,
@@ -424,11 +455,9 @@
                 engineerNotes: document.getElementById('engineerNotes').value
             };
 
-            // Hide form and start section generation
             document.getElementById('claimForm').parentElement.classList.add('hidden');
             document.getElementById('sectionProgress').classList.remove('hidden');
             
-            // Generate first section
             try {
                 const content = await generateSection(reportSections[0].id);
                 generatedSections[reportSections[0].id] = content;
@@ -438,34 +467,46 @@
             }
         });
 
-        // Rating handlers
+        // Word count handler
+        document.getElementById('ratingFeedback').addEventListener('input', (e) => {
+            const words = e.target.value.trim().split(/\s+/).filter(word => word.length > 0);
+            const wordCount = words.length;
+            document.getElementById('wordCount').textContent = `${wordCount} words`;
+            
+            const submitButton = document.getElementById('submitRating');
+            const hasRating = document.querySelector('.rating-button.bg-blue-500') !== null;
+            submitButton.disabled = !(wordCount >= 10 && hasRating);
+        });
+
+        // Rating button handlers
         document.getElementById('rateSection').addEventListener('click', () => {
-            const popup = document.getElementById('ratingPopup');
-            popup.classList.toggle('hidden');
+            document.getElementById('ratingPopup').classList.toggle('hidden');
         });
 
         document.querySelectorAll('.rating-button').forEach(button => {
             button.addEventListener('click', () => {
-                const rating = parseInt(button.dataset.rating);
-                currentSectionRating = rating;
-                
-                // Update button styles
                 document.querySelectorAll('.rating-button').forEach(btn => {
                     btn.classList.remove('bg-blue-500', 'text-white');
                 });
                 button.classList.add('bg-blue-500', 'text-white');
                 
-                // Show message
-                const message = document.getElementById('ratingMessage');
-                message.textContent = `Rating of ${rating}/7 submitted!`;
-                message.classList.remove('hidden');
-                
-                // Hide popup after selection
-                document.getElementById('ratingPopup').classList.add('hidden');
-                
-                const currentSection = reportSections[currentSectionIndex];
-                console.log(`Section ${currentSection.id} rated: ${rating}/7`);
+                const wordCount = document.getElementById('ratingFeedback').value.trim().split(/\s+/).filter(word => word.length > 0).length;
+                document.getElementById('submitRating').disabled = wordCount < 10;
             });
+        });
+
+        // Submit rating handler
+        document.getElementById('submitRating').addEventListener('click', () => {
+            const rating = document.querySelector('.rating-button.bg-blue-500').dataset.rating;
+            const feedback = document.getElementById('ratingFeedback').value;
+            const currentSection = reportSections[currentSectionIndex];
+            
+            console.log(`Section ${currentSection.id} rated: ${rating}/7`);
+            console.log(`Feedback: ${feedback}`);
+            
+            document.getElementById('ratingMessage').textContent = `Rating of ${rating}/7 submitted!`;
+            document.getElementById('ratingMessage').classList.remove('hidden');
+            document.getElementById('ratingPopup').classList.add('hidden');
         });
 
         // Handle rating popup close
@@ -501,8 +542,9 @@
             }
         });
 
-        // Accept section handler
+        // Accept section handler with rating reset
         document.getElementById('acceptSection').addEventListener('click', async () => {
+            resetRatingUI();
             currentSectionIndex++;
             
             if (currentSectionIndex >= reportSections.length) {
