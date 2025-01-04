@@ -51,6 +51,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
+        <!-- Title changed to "NSF Intake Process" -->
         <h1 class="text-3xl font-bold text-center mb-8">NSF INTAKE PROCESS</h1>
 
         <!-- Main Form -->
@@ -108,15 +109,17 @@
                     </div>
                 </div>
 
-                <!-- PROJECT BASIC INFORMATION -->
+                <!-- PROJECT BASIC INFORMATION (Substitute for "Basic Information") -->
                 <div class="space-y-4">
                     <h2 class="text-xl font-semibold">Project Basic Information</h2>
                     
+                    <!-- Replacing "Investigation Date" with "Inspection Date," keeping the same ID -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 font-bold">Inspection Date</label>
                         <input type="date" id="investigationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
 
+                    <!-- Replacing "Client Name" field with "Project Name," but we keep the same ID for code consistency -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 font-bold">Project Name (again)</label>
                         <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required placeholder="e.g., 'Smith Commercial Bldg'">
@@ -151,10 +154,11 @@
                     </div>
                 </div>
 
-                <!-- CLAIM DATA -->
+                <!-- CLAIM DATA (Substitute for "Claim Information") -->
                 <div class="space-y-4">
                     <h2 class="text-xl font-semibold">Claim Data</h2>
 
+                    <!-- Claim Type with only 'Wind, Hail, Foundation' -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Claim Type</label>
                         <select id="claimType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
@@ -164,6 +168,7 @@
                         </select>
                     </div>
 
+                    <!-- Keep Date of Loss and Causation Date as is -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Date of Loss (When damage was discovered)</label>
                         <input type="date" id="dateOfLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
@@ -174,15 +179,16 @@
                         <p class="text-sm text-gray-500 mt-1">Leave blank if same as Date of Loss</p>
                     </div>
 
+                    <!-- "Property Location" repeated again -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Property Location (repeat address)</label>
                         <input type="text" id="location" placeholder="Full address including city, state, and ZIP" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
                 </div>
 
-                <!-- PROPERTY ANALYSIS QUESTIONS (answer if applicable) -->
+                <!-- PROPERTY ANALYSIS QUESTIONS -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold">Property Analysis Questions (answer if applicable)</h2>
+                    <h2 class="text-xl font-semibold">Property Analysis Questions</h2>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">
@@ -261,8 +267,8 @@
                         <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
                     </div>
 
-                    <!-- METAL (answer if applicable) -->
-                    <h3 class="font-bold">Metal (answer if applicable)</h3>
+                    <!-- METAL ROOF CHECKBOX AND DETAILS -->
+                    <h3 class="font-bold">Metal</h3>
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" class="rounded">
                         <label>Is the roof metal or aluminum?</label>
@@ -338,8 +344,8 @@
                         <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
                     </div>
 
-                    <!-- Composition Shingles (answer if applicable) -->
-                    <h3 class="font-bold">Composition Shingles (answer if applicable)</h3>
+                    <!-- Composition Shingles -->
+                    <h3 class="font-bold">Composition Shingles</h3>
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" class="rounded">
                         <label>Check if composition shingles are present</label>
@@ -440,8 +446,8 @@
                         <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
                     </div>
 
-                    <!-- Clay Tile Roofing (answer if applicable) -->
-                    <h3 class="font-bold">Clay Tile Roofing (answer if applicable)</h3>
+                    <!-- Clay Tile Roofing -->
+                    <h3 class="font-bold">Clay Tile Roofing</h3>
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" class="rounded">
                         <label>Check if clay tile roofing is present</label>
@@ -487,8 +493,8 @@
                         <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
                     </div>
 
-                    <!-- Concrete Tile Roofing (answer if applicable) -->
-                    <h3 class="font-bold">Concrete Tile Roofing (answer if applicable)</h3>
+                    <!-- Concrete Tile Roofing -->
+                    <h3 class="font-bold">Concrete Tile Roofing</h3>
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" class="rounded">
                         <label>Check if concrete tile roofing is present</label>
@@ -718,6 +724,7 @@
         </div>
     </div>
 
+    <!-- Script block (unchanged except for final button text references) -->
     <script>
         // Report sections configuration
         const reportSections = [
@@ -832,6 +839,7 @@
         document.getElementById('claimForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Gather form data. Preserving existing field IDs for code compatibility.
             formContext = {
                 investigationDate: document.getElementById('investigationDate').value,
                 clientName: document.getElementById('clientName').value,
