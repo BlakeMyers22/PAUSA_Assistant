@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>North Star Forensic Engineers (NSFE)</title>
+    <title>NSF Intake Process</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
     
@@ -51,23 +51,78 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center mb-8">North Star Forensic Engineers (NSFE)</h1>
+        <!-- Title changed to "NSF Intake Process" -->
+        <h1 class="text-3xl font-bold text-center mb-8">NSF INTAKE PROCESS</h1>
 
         <!-- Main Form -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <form id="claimForm" class="space-y-6">
-                <!-- Basic Information -->
+                <!-- CLIENT CREDENTIALS -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold">Basic Information</h2>
+                    <h2 class="text-xl font-semibold">Client Credentials</h2>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Investigation Date</label>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Client Name</label>
+                        <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Law Firm Name</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Enter law firm name here...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Phone Number</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="(555) 555-5555">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Email</label>
+                        <input type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="client@example.com">
+                    </div>
+                </div>
+
+                <!-- PROJECT DATA -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Project Data</h2>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Project Name</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="e.g., 'Smith Commercial Bldg'">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Property Owner Name</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Address</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="1234 Main St, City, State ZIP">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Phone Number</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Email</label>
+                        <input type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">DOL (Date of Loss)</label>
+                        <input type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                </div>
+
+                <!-- PROJECT BASIC INFORMATION (Substitute for "Basic Information") -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Project Basic Information</h2>
+                    
+                    <!-- Replacing "Investigation Date" with "Inspection Date," keeping the same ID -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Inspection Date</label>
                         <input type="date" id="investigationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
 
+                    <!-- Replacing "Client Name" field with "Project Name," but we keep the same ID for code consistency -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Client Name</label>
-                        <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        <label class="block text-sm font-medium text-gray-700 font-bold">Project Name (again)</label>
+                        <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required placeholder="e.g., 'Smith Commercial Bldg'">
                     </div>
 
                     <div>
@@ -99,40 +154,384 @@
                     </div>
                 </div>
 
-                <!-- Claim Information -->
+                <!-- CLAIM DATA (Substitute for "Claim Information") -->
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold">Claim Information</h2>
+                    <h2 class="text-xl font-semibold">Claim Data</h2>
 
+                    <!-- Claim Type with only 'Wind, Hail, Foundation' -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Claim Type</label>
                         <select id="claimType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
-                            <option value="hail">Hail Damage</option>
-                            <option value="wind">Wind Damage</option>
-                            <option value="water">Water Damage</option>
-                            <option value="fire">Fire Damage</option>
-                            <option value="structural">Structural Damage</option>
-                            <option value="other">Other</option>
+                            <option value="hail">Hail</option>
+                            <option value="wind">Wind</option>
+                            <option value="foundation">Foundation</option>
                         </select>
                     </div>
 
+                    <!-- Keep Date of Loss and Causation Date as is -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Date of Loss (When damage was discovered)</label>
                         <input type="date" id="dateOfLoss" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Causation Date (When the cause occurred, if different)</label>
                         <input type="date" id="causationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
                         <p class="text-sm text-gray-500 mt-1">Leave blank if same as Date of Loss</p>
                     </div>
 
+                    <!-- "Property Location" repeated again -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Property Location</label>
+                        <label class="block text-sm font-medium text-gray-700">Property Location (repeat address)</label>
                         <input type="text" id="location" placeholder="Full address including city, state, and ZIP" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
                     </div>
                 </div>
 
-                <!-- Damage Assessment -->
+                <!-- PROPERTY ANALYSIS QUESTIONS -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Property Analysis Questions</h2>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What is the purported cause of loss?
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="e.g., hail, wind, foundation movement"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How big was the hail and what direction did it come from?
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How intense was the wind and what direction did it come from?
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How many times has the roof been replaced?
+                        </label>
+                        <input type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What year was the most recent roof installed?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What direction is the prevailing wind? (e.g., N, W, S, E)
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What is the pitch of the majority of the roof?
+                        </label>
+                        <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <option value="1/12">1/12</option>
+                            <option value="2/12">2/12</option>
+                            <option value="3/12">3/12</option>
+                            <option value="4/12">4/12</option>
+                            <option value="5/12">5/12</option>
+                            <option value="6/12">6/12</option>
+                            <option value="7/12">7/12</option>
+                            <option value="8/12">8/12</option>
+                            <option value="9/12">9/12</option>
+                            <option value="10/12">10/12</option>
+                            <option value="11/12">11/12</option>
+                            <option value="13/12">13/12</option>
+                            <option value="14/12">14/12</option>
+                            <option value="15/12">15/12</option>
+                            <option value="16/12">16/12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What size is the collateral damage or hail spatter?
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What damage is visible to parapet caps and other soft metals (vents, A/C units, gutters)?
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Measure the impacts and provide the size of the impact indention.
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+
+                    <!-- METAL ROOF CHECKBOX AND DETAILS -->
+                    <h3 class="font-bold">Metal</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Is the roof metal or aluminum?</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What gauge is the roofing material?
+                        </label>
+                        <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <option value="29">29 (thinnest)</option>
+                            <option value="28">28</option>
+                            <option value="27">27</option>
+                            <option value="26">26</option>
+                            <option value="25">25</option>
+                            <option value="24">24</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Select all that apply:
+                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">PBR Panel</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">Standing Seam</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">Trapezoidal</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">Corrugated</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">Decra</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">Aluminum Shake</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="rounded">
+                                <label class="ml-2">Other (Please specify below)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Additional engineer notes (if "Other")</label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            If it is PBR panel, in which direction is the short lap facing?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Are there gaps in the seam caused by wind or hail?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Is the roof capable of shedding water as it did prior to the weather event?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+
+                    <!-- Composition Shingles -->
+                    <h3 class="font-bold">Composition Shingles</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Check if composition shingles are present</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Identify the number of damaged shingles on wind-facing vs. leeward side
+                        </label>
+                        <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How many different slopes of the roof are damaged?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How many shingles are damaged in a 100 sq/ft test square?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Are the shingles able to survive a “brittle test”?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What is the density or weight of the shingles?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+
+                    <!-- Single-Ply Membrane -->
+                    <h3 class="font-bold">Single-Ply Membrane</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Check if single-ply membrane is present</label>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <input type="checkbox" class="rounded">
+                            <label class="ml-2">TPO</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="rounded">
+                            <label class="ml-2">EPDM</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="rounded">
+                            <label class="ml-2">PVC</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Is the membrane fully adhered or mechanically fastened?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Are there visible penetrations in the membrane?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+
+                    <!-- Modified Bitumen -->
+                    <h3 class="font-bold">Modified Bitumen</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Check if mod-bit is present</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Is there visible hail damage to the mod-bit?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+
+                    <!-- Built Up Roofing w/ Gravel Ballast -->
+                    <h3 class="font-bold">Built Up Roofing w/ Gravel Ballast</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Check if BUR w/ gravel is present</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Are there “bird nests” present in the gravel ballast?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Does the underlying matting show visible hail damage?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+
+                    <!-- Clay Tile Roofing -->
+                    <h3 class="font-bold">Clay Tile Roofing</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Check if clay tile roofing is present</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Who is the manufacturer?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Is this a discontinued product?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How old is the roof?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            How is the tile attached? (e.g. mortar bed, nailed, or both)
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What is the underlayment? (e.g., rolled roofing, tar paper, synthetic)
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Is drip edge present?
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What shape is the tile? (e.g. flat, mission, Spanish, French, Riviera, Pantile)
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+
+                    <!-- Concrete Tile Roofing -->
+                    <h3 class="font-bold">Concrete Tile Roofing</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" class="rounded">
+                        <label>Check if concrete tile roofing is present</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Who is the manufacturer?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Is this a discontinued product?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No/Notes">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">How old is the roof?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">How is the tile attached?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">What is the underlayment?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Is drip edge present?</label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Yes/No">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            What shape is the tile? (e.g. flat, mission, Spanish, French, Riviera, Pantile)
+                        </label>
+                        <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                    </div>
+                </div>
+
+                <!-- DAMAGE ASSESSMENT -->
                 <div class="space-y-4">
                     <h2 class="text-xl font-semibold">Damage Assessment</h2>
                     
@@ -173,13 +572,14 @@
                     </div>
                 </div>
 
+                <!-- Final button text changed to "Complete Intake" -->
                 <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                    Begin Report Generation
+                    Complete Intake
                 </button>
             </form>
         </div>
 
-        <!-- Section Generation Progress -->
+        <!-- Section Generation Progress (unchanged) -->
         <div id="sectionProgress" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4">Report Generation Progress</h2>
             <div class="space-y-2">
@@ -218,8 +618,7 @@
             </div>
         </div>
 
-
-        <!-- Current Section Review -->
+        <!-- Current Section Review (unchanged) -->
         <div id="sectionReview" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4">Review Current Section</h2>
             <div id="currentSectionTitle" class="text-lg font-medium mb-2"></div>
@@ -271,7 +670,7 @@
                 Rating submitted!
             </div>
 
-            <!-- Regeneration Dialog -->
+            <!-- Regeneration Dialog (unchanged) -->
             <div id="regenerationDialog" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
                     <h3 class="text-lg font-semibold mb-4">Regenerate Section</h3>
@@ -305,7 +704,7 @@
             </div>
         </div>
 
-        <!-- Complete Report Preview -->
+        <!-- Complete Report Preview (unchanged) -->
         <div id="reportPreview" class="hidden bg-white rounded-lg shadow-lg p-6">
             <h2 class="text-xl font-semibold mb-4">Complete Report</h2>
             <div id="completeReport" class="prose"></div>
@@ -316,7 +715,7 @@
             </div>
         </div>
 
-        <!-- Loading Indicator -->
+        <!-- Loading Indicator (unchanged) -->
         <div id="loadingIndicator" class="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white p-6 rounded-lg shadow-xl">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
@@ -325,6 +724,7 @@
         </div>
     </div>
 
+    <!-- Script block (unchanged except for final button text references) -->
     <script>
         // Report sections configuration
         const reportSections = [
@@ -439,6 +839,7 @@
         document.getElementById('claimForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Gather form data. Preserving existing field IDs for code compatibility.
             formContext = {
                 investigationDate: document.getElementById('investigationDate').value,
                 clientName: document.getElementById('clientName').value,
