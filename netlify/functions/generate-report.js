@@ -379,7 +379,7 @@ Follow professional standards while varying language from the sample.`
     : basePrompt;
 
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model: 'o1',
     messages: [
       {
         role: 'system',
