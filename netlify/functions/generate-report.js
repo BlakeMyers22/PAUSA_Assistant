@@ -351,7 +351,7 @@ exports.handler = async function(event) {
 
     // Create chat completion
     const completion = await openai.chat.completions.create({
-      model: 'chatgpt-4o-latest', 
+      model: 'o1', 
       // or 'gpt-3.5-turbo' if needed
       messages: [
         {
