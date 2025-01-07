@@ -50,7 +50,7 @@
   <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-center mb-8">NSF INSPECTION PROCESS</h1>
 
-    <!-- Main Form (exact same fields) -->
+    <!-- Main Form (with the new Save Inputs button, no "Project Name (again)" section) -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-8" id="intakeContainer">
       <form id="claimForm" class="space-y-6">
         
@@ -89,10 +89,6 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 font-bold">Inspection Date</label>
             <input type="date" id="investigationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 font-bold">Project Name (again)</label>
-            <input type="text" id="clientName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">Property Type</label>
@@ -395,6 +391,13 @@
             </label>
             <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" id="singleVisiblePenetrations" />
           </div>
+          <!-- NEW Engineer Notes Subsection for single-ply -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">
+              Engineer Notes
+            </label>
+            <textarea rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" id="singleEngineerNotes"></textarea>
+          </div>
 
           <!-- Modified Bitumen -->
           <div class="flex items-center space-x-2">
@@ -573,18 +576,29 @@
           </div>
         </div>
 
-        <!-- Final button -->
-        <button 
-          type="submit" 
-          class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-        >
-          Complete Inspection
-        </button>
+        <!-- Buttons at bottom of first page -->
+        <div class="flex space-x-4 mt-6">
+          <button 
+            type="submit" 
+            class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+          >
+            Complete Inspection
+          </button>
+          
+          <!-- Save Inputs button (prompt for filename) -->
+          <button 
+            type="button" 
+            id="saveInputs" 
+            class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+          >
+            Save Inputs
+          </button>
+        </div>
 
         <!-- Upload JSON input feature (to re-fill the form) -->
         <div class="mt-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            Or Upload Previously Downloaded Inputs (JSON)
+            Or Upload Previously Saved Inputs (JSON)
           </label>
           <input 
             type="file" 
@@ -738,12 +752,9 @@
     <div id="reportPreview" class="hidden bg-white rounded-lg shadow-lg p-6">
       <h2 class="text-xl font-semibold mb-4">Complete Report</h2>
       <div id="completeReport" class="prose"></div>
-      <div class="mt-6 flex space-x-4">
+      <div class="mt-6">
         <button id="downloadReport" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
           Download Report
-        </button>
-        <button id="downloadInputs" class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">
-          Download Inputs
         </button>
       </div>
     </div>
@@ -876,7 +887,6 @@
         projectEmail: document.getElementById('projectEmail').value,
         dol: document.getElementById('dol').value,
         investigationDate: document.getElementById('investigationDate').value,
-        clientName: document.getElementById('clientName').value,
         propertyType: document.getElementById('propertyType').value,
         propertyAge: document.getElementById('propertyAge').value,
         constructionType: document.getElementById('constructionType').value,
@@ -944,6 +954,8 @@
         singlePVC: document.getElementById('singlePVC').checked,
         singleMembraneAttachment: document.getElementById('singleMembraneAttachment').value,
         singleVisiblePenetrations: document.getElementById('singleVisiblePenetrations').value,
+        // Newly added engineer notes for single-ply
+        singleEngineerNotes: document.getElementById('singleEngineerNotes').value,
 
         roofModBitChecked: document.getElementById('roofModBitCheckbox').checked,
         modBitHailDamage: document.getElementById('modBitHailDamage').value,
@@ -985,7 +997,270 @@
       }
     });
 
-    // Accept & Continue
+    // Save Inputs button
+    document.getElementById('saveInputs').addEventListener('click', () => {
+      // Gather data from the same fields that would go into formContext
+      // but let's ensure we do the same approach as the form submit, or
+      // we can do it simpler by reusing the same approach above.
+      // We'll do it the same way, so the user can save any time before hitting "Complete Inspection."
+
+      const claimTypes = [];
+      if (document.getElementById('claimHail').checked) claimTypes.push('Hail');
+      if (document.getElementById('claimWind').checked) claimTypes.push('Wind');
+      if (document.getElementById('claimFoundation').checked) claimTypes.push('Foundation');
+
+      // We'll write it into a local object instead of messing with formContext:
+      const currentData = {
+        projectName: document.getElementById('projectName').value,
+        propertyOwnerName: document.getElementById('propertyOwnerName').value,
+        address: document.getElementById('address').value,
+        phoneNumber: document.getElementById('phoneNumber').value,
+        projectEmail: document.getElementById('projectEmail').value,
+        dol: document.getElementById('dol').value,
+        investigationDate: document.getElementById('investigationDate').value,
+        propertyType: document.getElementById('propertyType').value,
+        propertyAge: document.getElementById('propertyAge').value,
+        constructionType: document.getElementById('constructionType').value,
+        currentUse: document.getElementById('currentUse').value,
+        squareFootage: document.getElementById('squareFootage').value,
+        
+        claimType: claimTypes,
+        dateOfLoss: document.getElementById('dateOfLoss').value,
+        causationDate: document.getElementById('causationDate').value || document.getElementById('dateOfLoss').value,
+
+        // Affected areas
+        affectedAreas: [
+          ...(document.getElementById('roof').checked ? ['Roof'] : []),
+          ...(document.getElementById('siding').checked ? ['Siding'] : []),
+          ...(document.getElementById('windows').checked ? ['Windows'] : []),
+          ...(document.getElementById('gutters').checked ? ['Gutters'] : []),
+          ...(document.getElementById('foundation').checked ? ['Foundation'] : []),
+          ...(document.getElementById('interior').checked ? ['Interior'] : [])
+        ],
+
+        engineerNotes: document.getElementById('engineerNotes').value,
+        engineerName: document.getElementById('engineerName').value,
+        engineerEmail: document.getElementById('engineerEmail').value,
+        engineerLicense: document.getElementById('engineerLicense').value,
+        engineerPhone: document.getElementById('engineerPhone').value,
+
+        // Additional property analysis text
+        analysisCause: document.getElementById('analysisCause').value,
+        analysisHail: document.getElementById('analysisHail').value,
+        analysisWind: document.getElementById('analysisWind').value,
+        analysisRoofReplaced: document.getElementById('analysisRoofReplaced').value,
+        analysisRoofYear: document.getElementById('analysisRoofYear').value,
+        analysisWindDirection: document.getElementById('analysisWindDirection').value,
+        analysisRoofPitch: document.getElementById('analysisRoofPitch').value,
+        analysisHailSpatter: document.getElementById('analysisHailSpatter').value,
+        analysisSoftMetals: document.getElementById('analysisSoftMetals').value,
+        analysisImpactSize: document.getElementById('analysisImpactSize').value,
+
+        // Roofing subcategories
+        roofMetalChecked: document.getElementById('roofMetalCheckbox').checked,
+        roofMetalAluminum: document.getElementById('roofMetalAluminum').value,
+        roofMetalGauge: document.getElementById('roofMetalGauge').value,
+        metalPBR: document.getElementById('metalPBR').checked,
+        metalSeam: document.getElementById('metalSeam').checked,
+        metalTrapezoidal: document.getElementById('metalTrapezoidal').checked,
+        metalCorrugated: document.getElementById('metalCorrugated').checked,
+        metalDecra: document.getElementById('metalDecra').checked,
+        metalAluminumShake: document.getElementById('metalAluminumShake').checked,
+        metalOther: document.getElementById('metalOther').checked,
+        metalOtherNotes: document.getElementById('metalOtherNotes').value,
+        pbrShortLapDirection: document.getElementById('pbrShortLapDirection').value,
+        metalSeamGaps: document.getElementById('metalSeamGaps').value,
+        metalSheddingWater: document.getElementById('metalSheddingWater').value,
+
+        roofCompChecked: document.getElementById('roofCompCheckbox').checked,
+        compDamagedShingles: document.getElementById('compDamagedShingles').value,
+        compSlopesDamaged: document.getElementById('compSlopesDamaged').value,
+        compShinglesTestSquare: document.getElementById('compShinglesTestSquare').value,
+        compBrittleTest: document.getElementById('compBrittleTest').value,
+        compShingleDensity: document.getElementById('compShingleDensity').value,
+
+        roofSinglePlyChecked: document.getElementById('roofSinglePlyCheckbox').checked,
+        singleTPO: document.getElementById('singleTPO').checked,
+        singleEPDM: document.getElementById('singleEPDM').checked,
+        singlePVC: document.getElementById('singlePVC').checked,
+        singleMembraneAttachment: document.getElementById('singleMembraneAttachment').value,
+        singleVisiblePenetrations: document.getElementById('singleVisiblePenetrations').value,
+        singleEngineerNotes: document.getElementById('singleEngineerNotes').value,
+
+        roofModBitChecked: document.getElementById('roofModBitCheckbox').checked,
+        modBitHailDamage: document.getElementById('modBitHailDamage').value,
+
+        roofBURChecked: document.getElementById('roofBURCheckbox').checked,
+        burBirdNests: document.getElementById('burBirdNests').value,
+        burMattingDamage: document.getElementById('burMattingDamage').value,
+
+        roofClayTileChecked: document.getElementById('roofClayTileCheckbox').checked,
+        clayTileManufacturer: document.getElementById('clayTileManufacturer').value,
+        clayTileDiscontinued: document.getElementById('clayTileDiscontinued').value,
+        clayTileAge: document.getElementById('clayTileAge').value,
+        clayTileAttach: document.getElementById('clayTileAttach').value,
+        clayTileUnderlayment: document.getElementById('clayTileUnderlayment').value,
+        clayTileDripEdge: document.getElementById('clayTileDripEdge').value,
+        clayTileShape: document.getElementById('clayTileShape').value,
+
+        roofConcreteTileChecked: document.getElementById('roofConcreteTileCheckbox').checked,
+        concreteTileManufacturer: document.getElementById('concreteTileManufacturer').value,
+        concreteTileDiscontinued: document.getElementById('concreteTileDiscontinued').value,
+        concreteTileAge: document.getElementById('concreteTileAge').value,
+        concreteTileAttach: document.getElementById('concreteTileAttach').value,
+        concreteTileUnderlayment: document.getElementById('concreteTileUnderlayment').value,
+        concreteTileDripEdge: document.getElementById('concreteTileDripEdge').value,
+        concreteTileShape: document.getElementById('concreteTileShape').value
+      };
+
+      const jsonData = JSON.stringify(currentData, null, 2);
+
+      // Prompt user for a filename
+      let chosenName = prompt("Enter a file name to save your inputs (without .json)");
+      if (!chosenName) return; // user canceled
+      // Remove any extension, add .json
+      chosenName = chosenName.replace(/\.[^.]*$/, '');
+      chosenName += ".json";
+
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = chosenName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
+
+    // Upload inputs (JSON)
+    document.getElementById('uploadInputs').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+
+          // Fill each field from data.* if present
+          document.getElementById('projectName').value = data.projectName || '';
+          document.getElementById('propertyOwnerName').value = data.propertyOwnerName || '';
+          document.getElementById('address').value = data.address || '';
+          document.getElementById('phoneNumber').value = data.phoneNumber || '';
+          document.getElementById('projectEmail').value = data.projectEmail || '';
+          document.getElementById('dol').value = data.dol || '';
+
+          document.getElementById('investigationDate').value = data.investigationDate || '';
+          document.getElementById('propertyType').value = data.propertyType || 'residential';
+          document.getElementById('propertyAge').value = data.propertyAge || '';
+          document.getElementById('constructionType').value = data.constructionType || '';
+          document.getElementById('currentUse').value = data.currentUse || '';
+          document.getElementById('squareFootage').value = data.squareFootage || '';
+
+          // Claim Type
+          if (data.claimType) {
+            document.getElementById('claimHail').checked = data.claimType.includes('Hail');
+            document.getElementById('claimWind').checked = data.claimType.includes('Wind');
+            document.getElementById('claimFoundation').checked = data.claimType.includes('Foundation');
+          }
+          document.getElementById('dateOfLoss').value = data.dateOfLoss || '';
+          document.getElementById('causationDate').value = data.causationDate || '';
+
+          // Affected areas
+          if (data.affectedAreas) {
+            document.getElementById('roof').checked = data.affectedAreas.includes('Roof');
+            document.getElementById('siding').checked = data.affectedAreas.includes('Siding');
+            document.getElementById('windows').checked = data.affectedAreas.includes('Windows');
+            document.getElementById('gutters').checked = data.affectedAreas.includes('Gutters');
+            document.getElementById('foundation').checked = data.affectedAreas.includes('Foundation');
+            document.getElementById('interior').checked = data.affectedAreas.includes('Interior');
+          }
+
+          document.getElementById('engineerNotes').value = data.engineerNotes || '';
+          document.getElementById('engineerName').value = data.engineerName || '';
+          document.getElementById('engineerEmail').value = data.engineerEmail || '';
+          document.getElementById('engineerLicense').value = data.engineerLicense || '';
+          document.getElementById('engineerPhone').value = data.engineerPhone || '';
+
+          document.getElementById('analysisCause').value = data.analysisCause || '';
+          document.getElementById('analysisHail').value = data.analysisHail || '';
+          document.getElementById('analysisWind').value = data.analysisWind || '';
+          document.getElementById('analysisRoofReplaced').value = data.analysisRoofReplaced || '';
+          document.getElementById('analysisRoofYear').value = data.analysisRoofYear || '';
+          document.getElementById('analysisWindDirection').value = data.analysisWindDirection || '';
+          document.getElementById('analysisRoofPitch').value = data.analysisRoofPitch || '';
+          document.getElementById('analysisHailSpatter').value = data.analysisHailSpatter || '';
+          document.getElementById('analysisSoftMetals').value = data.analysisSoftMetals || '';
+          document.getElementById('analysisImpactSize').value = data.analysisImpactSize || '';
+
+          // Roof categories
+          document.getElementById('roofMetalCheckbox').checked = data.roofMetalChecked || false;
+          document.getElementById('roofMetalAluminum').value = data.roofMetalAluminum || '';
+          document.getElementById('roofMetalGauge').value = data.roofMetalGauge || '29';
+          document.getElementById('metalPBR').checked = data.metalPBR || false;
+          document.getElementById('metalSeam').checked = data.metalSeam || false;
+          document.getElementById('metalTrapezoidal').checked = data.metalTrapezoidal || false;
+          document.getElementById('metalCorrugated').checked = data.metalCorrugated || false;
+          document.getElementById('metalDecra').checked = data.metalDecra || false;
+          document.getElementById('metalAluminumShake').checked = data.metalAluminumShake || false;
+          document.getElementById('metalOther').checked = data.metalOther || false;
+          document.getElementById('metalOtherNotes').value = data.metalOtherNotes || '';
+          document.getElementById('pbrShortLapDirection').value = data.pbrShortLapDirection || '';
+          document.getElementById('metalSeamGaps').value = data.metalSeamGaps || '';
+          document.getElementById('metalSheddingWater').value = data.metalSheddingWater || '';
+
+          document.getElementById('roofCompCheckbox').checked = data.roofCompChecked || false;
+          document.getElementById('compDamagedShingles').value = data.compDamagedShingles || '';
+          document.getElementById('compSlopesDamaged').value = data.compSlopesDamaged || '';
+          document.getElementById('compShinglesTestSquare').value = data.compShinglesTestSquare || '';
+          document.getElementById('compBrittleTest').value = data.compBrittleTest || '';
+          document.getElementById('compShingleDensity').value = data.compShingleDensity || '';
+
+          document.getElementById('roofSinglePlyCheckbox').checked = data.roofSinglePlyChecked || false;
+          document.getElementById('singleTPO').checked = data.singleTPO || false;
+          document.getElementById('singleEPDM').checked = data.singleEPDM || false;
+          document.getElementById('singlePVC').checked = data.singlePVC || false;
+          document.getElementById('singleMembraneAttachment').value = data.singleMembraneAttachment || '';
+          document.getElementById('singleVisiblePenetrations').value = data.singleVisiblePenetrations || '';
+          // new single engineer notes
+          document.getElementById('singleEngineerNotes').value = data.singleEngineerNotes || '';
+
+          document.getElementById('roofModBitCheckbox').checked = data.roofModBitChecked || false;
+          document.getElementById('modBitHailDamage').value = data.modBitHailDamage || '';
+
+          document.getElementById('roofBURCheckbox').checked = data.roofBURChecked || false;
+          document.getElementById('burBirdNests').value = data.burBirdNests || '';
+          document.getElementById('burMattingDamage').value = data.burMattingDamage || '';
+
+          document.getElementById('roofClayTileCheckbox').checked = data.roofClayTileChecked || false;
+          document.getElementById('clayTileManufacturer').value = data.clayTileManufacturer || '';
+          document.getElementById('clayTileDiscontinued').value = data.clayTileDiscontinued || '';
+          document.getElementById('clayTileAge').value = data.clayTileAge || '';
+          document.getElementById('clayTileAttach').value = data.clayTileAttach || '';
+          document.getElementById('clayTileUnderlayment').value = data.clayTileUnderlayment || '';
+          document.getElementById('clayTileDripEdge').value = data.clayTileDripEdge || '';
+          document.getElementById('clayTileShape').value = data.clayTileShape || '';
+
+          document.getElementById('roofConcreteTileCheckbox').checked = data.roofConcreteTileChecked || false;
+          document.getElementById('concreteTileManufacturer').value = data.concreteTileManufacturer || '';
+          document.getElementById('concreteTileDiscontinued').value = data.concreteTileDiscontinued || '';
+          document.getElementById('concreteTileAge').value = data.concreteTileAge || '';
+          document.getElementById('concreteTileAttach').value = data.concreteTileAttach || '';
+          document.getElementById('concreteTileUnderlayment').value = data.concreteTileUnderlayment || '';
+          document.getElementById('concreteTileDripEdge').value = data.concreteTileDripEdge || '';
+          document.getElementById('concreteTileShape').value = data.concreteTileShape || '';
+
+          alert('Inputs loaded successfully!');
+        } catch (err) {
+          alert("Error parsing JSON file. Please check the console for details.");
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // ACCEPT & CONTINUE
     document.getElementById('acceptSection').addEventListener('click', async () => {
       currentSectionIndex++;
       if (currentSectionIndex >= reportSections.length) {
@@ -1099,146 +1374,6 @@
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-    });
-
-    // Download inputs
-    document.getElementById('downloadInputs').addEventListener('click', () => {
-      const inputDataStr = JSON.stringify(formContext, null, 2);
-      const blob = new Blob([inputDataStr], { type: 'application/json' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'initial-inputs.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    });
-
-    // Upload inputs (JSON)
-    document.getElementById('uploadInputs').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const data = JSON.parse(event.target.result);
-
-          // Now fill each field from data.* if present
-          document.getElementById('projectName').value = data.projectName || '';
-          document.getElementById('propertyOwnerName').value = data.propertyOwnerName || '';
-          document.getElementById('address').value = data.address || '';
-          document.getElementById('phoneNumber').value = data.phoneNumber || '';
-          document.getElementById('projectEmail').value = data.projectEmail || '';
-          document.getElementById('dol').value = data.dol || '';
-
-          document.getElementById('investigationDate').value = data.investigationDate || '';
-          document.getElementById('clientName').value = data.clientName || '';
-          document.getElementById('propertyType').value = data.propertyType || 'residential';
-          document.getElementById('propertyAge').value = data.propertyAge || '';
-          document.getElementById('constructionType').value = data.constructionType || '';
-          document.getElementById('currentUse').value = data.currentUse || '';
-          document.getElementById('squareFootage').value = data.squareFootage || '';
-
-          // Claim Type
-          if (data.claimType) {
-            document.getElementById('claimHail').checked = data.claimType.includes('Hail');
-            document.getElementById('claimWind').checked = data.claimType.includes('Wind');
-            document.getElementById('claimFoundation').checked = data.claimType.includes('Foundation');
-          }
-          document.getElementById('dateOfLoss').value = data.dateOfLoss || '';
-          document.getElementById('causationDate').value = data.causationDate || '';
-
-          // Affected areas
-          if (data.affectedAreas) {
-            document.getElementById('roof').checked = data.affectedAreas.includes('Roof');
-            document.getElementById('siding').checked = data.affectedAreas.includes('Siding');
-            document.getElementById('windows').checked = data.affectedAreas.includes('Windows');
-            document.getElementById('gutters').checked = data.affectedAreas.includes('Gutters');
-            document.getElementById('foundation').checked = data.affectedAreas.includes('Foundation');
-            document.getElementById('interior').checked = data.affectedAreas.includes('Interior');
-          }
-
-          document.getElementById('engineerNotes').value = data.engineerNotes || '';
-          document.getElementById('engineerName').value = data.engineerName || '';
-          document.getElementById('engineerEmail').value = data.engineerEmail || '';
-          document.getElementById('engineerLicense').value = data.engineerLicense || '';
-          document.getElementById('engineerPhone').value = data.engineerPhone || '';
-
-          document.getElementById('analysisCause').value = data.analysisCause || '';
-          document.getElementById('analysisHail').value = data.analysisHail || '';
-          document.getElementById('analysisWind').value = data.analysisWind || '';
-          document.getElementById('analysisRoofReplaced').value = data.analysisRoofReplaced || '';
-          document.getElementById('analysisRoofYear').value = data.analysisRoofYear || '';
-          document.getElementById('analysisWindDirection').value = data.analysisWindDirection || '';
-          document.getElementById('analysisRoofPitch').value = data.analysisRoofPitch || '';
-          document.getElementById('analysisHailSpatter').value = data.analysisHailSpatter || '';
-          document.getElementById('analysisSoftMetals').value = data.analysisSoftMetals || '';
-          document.getElementById('analysisImpactSize').value = data.analysisImpactSize || '';
-
-          // Roof categories
-          document.getElementById('roofMetalCheckbox').checked = data.roofMetalChecked || false;
-          document.getElementById('roofMetalAluminum').value = data.roofMetalAluminum || '';
-          document.getElementById('roofMetalGauge').value = data.roofMetalGauge || '29';
-          document.getElementById('metalPBR').checked = data.metalPBR || false;
-          document.getElementById('metalSeam').checked = data.metalSeam || false;
-          document.getElementById('metalTrapezoidal').checked = data.metalTrapezoidal || false;
-          document.getElementById('metalCorrugated').checked = data.metalCorrugated || false;
-          document.getElementById('metalDecra').checked = data.metalDecra || false;
-          document.getElementById('metalAluminumShake').checked = data.metalAluminumShake || false;
-          document.getElementById('metalOther').checked = data.metalOther || false;
-          document.getElementById('metalOtherNotes').value = data.metalOtherNotes || '';
-          document.getElementById('pbrShortLapDirection').value = data.pbrShortLapDirection || '';
-          document.getElementById('metalSeamGaps').value = data.metalSeamGaps || '';
-          document.getElementById('metalSheddingWater').value = data.metalSheddingWater || '';
-
-          document.getElementById('roofCompCheckbox').checked = data.roofCompChecked || false;
-          document.getElementById('compDamagedShingles').value = data.compDamagedShingles || '';
-          document.getElementById('compSlopesDamaged').value = data.compSlopesDamaged || '';
-          document.getElementById('compShinglesTestSquare').value = data.compShinglesTestSquare || '';
-          document.getElementById('compBrittleTest').value = data.compBrittleTest || '';
-          document.getElementById('compShingleDensity').value = data.compShingleDensity || '';
-
-          document.getElementById('roofSinglePlyCheckbox').checked = data.roofSinglePlyChecked || false;
-          document.getElementById('singleTPO').checked = data.singleTPO || false;
-          document.getElementById('singleEPDM').checked = data.singleEPDM || false;
-          document.getElementById('singlePVC').checked = data.singlePVC || false;
-          document.getElementById('singleMembraneAttachment').value = data.singleMembraneAttachment || '';
-          document.getElementById('singleVisiblePenetrations').value = data.singleVisiblePenetrations || '';
-
-          document.getElementById('roofModBitCheckbox').checked = data.roofModBitChecked || false;
-          document.getElementById('modBitHailDamage').value = data.modBitHailDamage || '';
-
-          document.getElementById('roofBURCheckbox').checked = data.roofBURChecked || false;
-          document.getElementById('burBirdNests').value = data.burBirdNests || '';
-          document.getElementById('burMattingDamage').value = data.burMattingDamage || '';
-
-          document.getElementById('roofClayTileCheckbox').checked = data.roofClayTileChecked || false;
-          document.getElementById('clayTileManufacturer').value = data.clayTileManufacturer || '';
-          document.getElementById('clayTileDiscontinued').value = data.clayTileDiscontinued || '';
-          document.getElementById('clayTileAge').value = data.clayTileAge || '';
-          document.getElementById('clayTileAttach').value = data.clayTileAttach || '';
-          document.getElementById('clayTileUnderlayment').value = data.clayTileUnderlayment || '';
-          document.getElementById('clayTileDripEdge').value = data.clayTileDripEdge || '';
-          document.getElementById('clayTileShape').value = data.clayTileShape || '';
-
-          document.getElementById('roofConcreteTileCheckbox').checked = data.roofConcreteTileChecked || false;
-          document.getElementById('concreteTileManufacturer').value = data.concreteTileManufacturer || '';
-          document.getElementById('concreteTileDiscontinued').value = data.concreteTileDiscontinued || '';
-          document.getElementById('concreteTileAge').value = data.concreteTileAge || '';
-          document.getElementById('concreteTileAttach').value = data.concreteTileAttach || '';
-          document.getElementById('concreteTileUnderlayment').value = data.concreteTileUnderlayment || '';
-          document.getElementById('concreteTileDripEdge').value = data.concreteTileDripEdge || '';
-          document.getElementById('concreteTileShape').value = data.concreteTileShape || '';
-
-          alert('Inputs loaded successfully!');
-        } catch (err) {
-          alert("Error parsing JSON file. Please check the console for details.");
-          console.error(err);
-        }
-      };
-      reader.readAsText(file);
     });
 
     // ESC key closes popups
