@@ -6,7 +6,7 @@
   to = "/index.html"
   status = 200
 
-# Headers for security and CORS
+# Security and CORS headers
 [[headers]]
   for = "/*"
   [headers.values]
