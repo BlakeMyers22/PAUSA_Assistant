@@ -341,7 +341,7 @@ exports.handler = async function(event) {
 
     // Create chat completion
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'chatgpt-4o-latest',
       messages: [
         {
           role: 'system',
@@ -349,7 +349,7 @@ exports.handler = async function(event) {
         }
       ],
       temperature: 0.0, // reduce "creative" contradictions
-      max_tokens: 3000
+      max_tokens: 4000
     });
 
     return {
