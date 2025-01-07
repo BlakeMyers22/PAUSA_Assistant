@@ -134,9 +134,9 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   // Affected areas
   const affectedAreas       = safeArrayJoin(context?.affectedAreas);
 
-  // Roof types from checkboxes
-  const roofTypesDetected   = safeArrayJoin(context?.roofType);
-
+  // We won’t parse every single sub-field for roofing, but you can expand if you want GPT to see them.
+  // This example just demonstrates how to keep the text consistent.
+  
   // Weather data
   let weatherSummary = '';
   if (weatherData?.note) {
@@ -151,42 +151,35 @@ You are an expert forensic engineer generating professional report sections.
 Use only the data from user inputs; do not invent details that contradict them.
 
 Key points:
-1. Do NOT invent roofing types if the user only specifies TPO or single-ply, etc.
-2. Do NOT mention multiple floors if the user has not indicated that (avoid referencing an upper floor if not specified).
-3. Keep Date of Loss (${dateOfLoss}) separate from Inspection Date (${investigationDate}).
-4. If weather data is missing or the date is in the future, note that briefly rather than printing "N/A".
-5. Avoid placeholders like [e.g., ...], [N/A], [Third Party].
-6. The user’s claim types: ${claimTypeString}.
-7. The roof type(s) specified: ${roofTypesDetected}.
-8. The property address: ${address}.
-9. The client name: ${clientName} or property owner: ${propertyOwnerName} if needed.
-10. The building type: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
-11. Weather Data Summary: ${weatherSummary}
+1. Avoid mentioning roofing types or multi-story details the user did not specify.
+2. Keep Date of Loss (${dateOfLoss}) separate from Investigation Date (${investigationDate}).
+3. If weather data is missing or the date is in the future, note that briefly rather than "N/A".
+4. Avoid placeholders like [e.g., ...], [N/A], [Third Party].
+5. The user’s claim types: ${claimTypeString}.
+6. Property address: ${address}.
+7. The client name: ${clientName} or property owner: ${propertyOwnerName}.
+8. Building type: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
+9. Weather Data Summary: ${weatherSummary}
 `;
 
   const basePrompts = {
     introduction: `
-You are writing the "Introduction" for a forensic engineering report.
-- Address: ${address}
-- Date of Loss: ${dateOfLoss}
-- Investigation Date: ${investigationDate}
-- Claim Type(s): ${claimTypeString}
+"Introduction" for a forensic engineering report.
+Address: ${address}
+Date of Loss: ${dateOfLoss}
+Inspection Date: ${investigationDate}
+Claim Type(s): ${claimTypeString}
 Explain the purpose of the inspection, referencing hail, wind, or other claimed causes.
-Do not add contradictory roofing details.
 `,
 
     authorization: `
-You are writing the "Authorization and Scope of Investigation" section.
-Include:
-1) Who authorized it (e.g., property owner or law firm).
-2) The scope of work (site visit, photos, etc.).
-3) Summarize major tasks.
-4) Note any references if available.
+"Authorization and Scope of Investigation"
+Include who authorized it, the scope of work, tasks performed, references if any.
 `,
 
     background: `
-You are writing "Background Information."
-Include relevant details:
+"Background Information"
+Include:
 - Property Type: ${propertyType}
 - Age: ${propertyAge}
 - Construction Type: ${constructionType}
@@ -194,53 +187,45 @@ Include relevant details:
 - Square Footage: ${squareFootage}
 - Project Name: ${projectName}
 - Property Owner: ${propertyOwnerName}
-No placeholders or contradictory info.
 `,
 
     observations: `
-You are writing "Site Observations and Analysis."
-Affected areas: ${affectedAreas}.
-Roof type(s): ${roofTypesDetected}.
-Claim type(s): ${claimTypeString}.
-
-Incorporate only what the user indicated. 
-If user said TPO was punctured by hail, mention it. Do not mention asphalt shingles if not indicated.
+"Site Observations and Analysis"
+Affected areas: ${affectedAreas}
+Claim type(s): ${claimTypeString}
+Include only user-indicated details (e.g., if TPO hail damage is indicated, mention it). 
 `,
 
     moisture: `
 "Survey" (Moisture) section.
-If the user indicated interior water intrusion, mention it. Otherwise, be concise.
+Discuss moisture presence or absence based on user data. 
+No contradictory statements.
 `,
 
     meteorologist: `
 "Meteorologist Report" section.
-Use the data:
+Use weather data from:
 ${weatherSummary}
-If not available or the date was in the future, note it. 
-Focus on how it might tie into hail/wind claims.
+If not available, note that.
 `,
 
     conclusions: `
-"Conclusions and Recommendations."
-Summarize your final opinion on the cause(s) of loss. 
-Propose next steps or repairs if relevant.
+"Conclusions and Recommendations"
+Summarize final opinions on the cause of loss and recommended next steps.
 `,
 
     rebuttal: `
-"Rebuttal" section. 
-If no third-party or conflicting reports were indicated, keep minimal. 
-Otherwise, address them.
+"Rebuttal" section.
+If no conflicting or third-party reports are indicated, keep it minimal or note that none exist.
 `,
 
     limitations: `
 "Limitations" section.
-Typical disclaimers about data reliance, scope boundaries, site access, etc.
-No placeholders.
+Typical disclaimers about scope, data reliance, and so forth.
 `,
 
     tableofcontents: `
-"Table of Contents" in markdown, with these headings in this order:
-
+"Table of Contents" in markdown:
 1. Opening Letter
 2. Introduction
 3. Authorization and Scope of Investigation
@@ -260,8 +245,8 @@ Include:
 - Investigation Date: ${investigationDate}
 - Claim Type(s): ${claimTypeString}
 - Address: ${address}
-- Brief greeting
-- Signature block: ${engineerName}, License: ${engineerLicense}, Email: ${engineerEmail}, Phone: ${engineerPhone}
+- Greeting
+- Signature block with ${engineerName}, license ${engineerLicense}, email ${engineerEmail}, phone ${engineerPhone}
 `
   };
 
@@ -322,8 +307,8 @@ exports.handler = async function(event) {
 
     // Create chat completion
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', 
-      // or 'gpt-4' if available
+      model: 'gpt-3.5-turbo',
+      // or 'gpt-4' if you have access
       messages: [
         {
           role: 'system',
