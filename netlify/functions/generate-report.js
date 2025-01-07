@@ -59,20 +59,20 @@ async function getWeatherData(location, dateString) {
       return { success: true, data: {} };
     }
 
-    // If the date is after "today", skip or note it.
+    // If the date is after "today," skip or note that it's a future date.
     const today = new Date();
     if (dateObj > today) {
       return { 
         success: true, 
         data: {
           note: `Weather data not found for a future date: ${dateObj.toISOString().split('T')[0]}`
-        } 
+        }
       };
     }
 
     const formattedDate = dateObj.toISOString().split('T')[0];
 
-    // Attempt call to WeatherAPI
+    // Attempt call to Weather API
     const response = await axios.get('http://api.weatherapi.com/v1/history.json', {
       params: {
         key: process.env.WEATHER_API_KEY,
@@ -108,11 +108,11 @@ async function getWeatherData(location, dateString) {
 }
 
 /**
- * Build the prompt for each section, instructing GPT to NOT produce a heading
- * with the section name. Instead, it should produce only the body text.
+ * Build the prompt for each section, instructing GPT to NOT produce 
+ * the heading itself—only the body text. That way, we avoid duplicates.
  */
 async function generateSectionPrompt(sectionName, context, weatherData, customInstructions = '') {
-  // Extract fields
+  // Safely extract fields
   const investigationDate   = safeString(context?.investigationDate);
   const dateOfLoss          = safeString(context?.dateOfLoss);
   const claimTypeString     = safeArrayJoin(context?.claimType);
@@ -129,11 +129,9 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   const engineerPhone       = safeString(context?.engineerPhone);
   const propertyOwnerName   = safeString(context?.propertyOwnerName);
   const projectName         = safeString(context?.projectName);
-
-  // Affected areas
   const affectedAreas       = safeArrayJoin(context?.affectedAreas);
 
-  // Weather data
+  // Build a short weather summary if available
   let weatherSummary = '';
   if (weatherData?.note) {
     weatherSummary = `Weather Data Note: ${weatherData.note}`;
@@ -141,97 +139,87 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
     weatherSummary = JSON.stringify(weatherData, null, 2);
   }
 
-  // Large system instruction to keep the generation consistent,
-  // and to prevent GPT from duplicating headings like "Introduction" or "Table of Contents."
+  // Big system instruction: GPT should NOT produce the headings 
+  // (like "Introduction") in its text, to prevent duplication.
   const bigSystemInstruction = `
 You are an expert forensic engineer generating professional report sections. 
-IMPORTANT: Do NOT produce an extra heading at the top saying "Introduction," "Table of Contents," etc.
-Because the code will insert that heading. 
-So only produce the BODY TEXT for this section. Avoid repeating the section name as a heading.
+IMPORTANT: Do NOT produce a heading at the top. The code will insert that heading. 
+So only produce the BODY TEXT for this section.
 
 Key points:
 1. Avoid placeholders like [e.g., ...], [N/A], or repeated headings.
-2. Use the user’s data only. 
-3. If date is in the future or weather data is missing, note it briefly but do not say "N/A."
-4. The user’s claim type(s): ${claimTypeString}.
-5. Address: ${address}.
-6. Building details: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
-7. Weather data summary: ${weatherSummary}.
-8. Do not produce a heading that duplicates the section name. Just produce the content for the section.
+2. If date is in the future or weather data is missing, note it briefly but do not say "N/A."
+3. The user’s claim type(s): ${claimTypeString}.
+4. Address: ${address}.
+5. Building details: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
+6. Weather data summary: ${weatherSummary}.
+7. Do not produce the section name as a heading, only body text.
 `;
 
-  // The base prompts remain the same, but we remove any instruction to produce a heading.
   const basePrompts = {
     introduction: `
 You are writing the body text for "Introduction." 
-Do NOT include the word "Introduction" as a heading. 
-Focus on the property at ${address}, the date of loss ${dateOfLoss}, the inspection date ${investigationDate}, 
-and the reason for the inspection (claim type: ${claimTypeString}).
+Do NOT include the heading. 
+Focus on property at ${address}, DOL ${dateOfLoss}, inspection date ${investigationDate}, 
+reason for inspection (claim type: ${claimTypeString}), etc.
 `,
 
     authorization: `
 You are writing the body text for "Authorization and Scope of Investigation."
-Do NOT include that heading in your text. 
-Summarize who authorized the investigation, the scope, major tasks, references if any.
+Do NOT include the heading. 
+Summarize who authorized, the scope, tasks, references, etc.
 `,
 
     background: `
 You are writing the body text for "Background Information."
-Do NOT include a heading. 
-Relevant details:
-- Property Type: ${propertyType}, Age: ${propertyAge}, Construction: ${constructionType}
-- Current Use: ${currentUse}, Square Footage: ${squareFootage}, etc.
-- Project Name: ${projectName}, Property Owner: ${propertyOwnerName}
+Do NOT include the heading. 
+Include property type, age, construction, current use, sq ft, project name, property owner, etc.
 `,
 
     observations: `
 You are writing the body text for "Site Observations and Analysis."
-Do NOT include a heading. 
-Affected areas: ${affectedAreas}, claim type(s): ${claimTypeString}.
-Mention only user-indicated details.
+Do NOT include the heading. 
+Affected areas: ${affectedAreas}; claim types: ${claimTypeString}.
+Only mention details the user input indicates.
 `,
 
     moisture: `
-You are writing the body text for "Survey" (Moisture) section.
-Do NOT include a heading. 
-Discuss moisture presence or absence. 
+You are writing the body text for the "Survey" (Moisture) section.
+Do NOT include the heading. 
+Discuss moisture presence/absence, etc.
 `,
 
     meteorologist: `
 You are writing the body text for "Meteorologist Report."
-Do NOT include a heading. 
-Use data from: ${weatherSummary}.
+Do NOT include the heading. 
+Use the data: ${weatherSummary}.
 `,
 
     conclusions: `
 You are writing the body text for "Conclusions and Recommendations."
-Do NOT include a heading. 
-Summarize final opinions on the cause of loss, recommended steps, etc.
+Do NOT include the heading. Summarize final opinions, recommended steps, etc.
 `,
 
     rebuttal: `
 You are writing the body text for "Rebuttal."
-Do NOT include a heading. 
-If no conflicting reports are indicated, keep it minimal.
+Do NOT include the heading. If no conflicting reports, keep it minimal.
 `,
 
     limitations: `
 You are writing the body text for "Limitations."
-Do NOT include a heading. 
-Standard disclaimers about scope, data reliance, etc.
+Do NOT include the heading. Provide disclaimers about scope, data reliance, etc.
 `,
 
     tableofcontents: `
 You are writing the body text for "Table of Contents."
-Do NOT include a heading that says "Table of Contents" again. 
-Just list or outline the sections in a minimal way.
+Do NOT include the heading. Just list sections simply.
 `,
 
     openingletter: `
 You are writing the body text for "Opening Letter."
-Do NOT include a heading. 
-Include a brief greeting, date of loss, inspection date, claim type(s), address, 
-and sign-off with the engineer’s name/license/email/phone.
+Do NOT include the heading. 
+Include a greeting, DOL, inspection date, claim type(s), address, 
+and a sign-off with engineer's name/license/email/phone.
 `
   };
 
@@ -242,7 +230,6 @@ without repeating the section name as a heading at the top.
 `;
 
   const basePrompt = basePrompts[normalizedSection] || fallbackPrompt;
-
   const safeCustom = safeString(customInstructions, '');
   const finalPrompt = safeCustom 
     ? `${basePrompt}\n\nAdditional instructions:\n${safeCustom}`
@@ -278,7 +265,7 @@ exports.handler = async function(event) {
   try {
     const { section, context: userContext, customInstructions } = JSON.parse(event.body) || {};
 
-    // Weather data fetch, skip for tableOfContents, openingLetter, introduction
+    // Attempt weather data fetch for sections except tableOfContents, openingLetter, introduction
     let weatherResult = { success: true, data: {} };
     const lowerSection = (section || '').trim().toLowerCase();
 
@@ -290,21 +277,21 @@ exports.handler = async function(event) {
       }
     }
 
-    // Build prompt
+    // Build final prompt
     const prompt = await generateSectionPrompt(section, userContext, weatherResult.data, customInstructions);
 
-    // Create chat completion
+    // Create Chat Completion
     const completion = await openai.chat.completions.create({
-      model: 'chatgpt-4o-latest',
-      // or 'gpt-3.5-turbo' if you prefer it
+      model: 'gpt-3.5-turbo', 
+      // or 'gpt-4' if you have it
       messages: [
         {
           role: 'system',
           content: prompt
         }
       ],
-      temperature: 0.0, // reduce "creative" contradictions
-      max_tokens: 4000
+      temperature: 0.0,  // reduce creativity
+      max_tokens: 3000
     });
 
     return {
