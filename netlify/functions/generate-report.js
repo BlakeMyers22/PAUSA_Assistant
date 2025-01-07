@@ -123,7 +123,6 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   const currentUse          = safeString(context?.currentUse);
   const squareFootage       = safeString(context?.squareFootage);
   const address             = safeString(context?.address);
-  const clientName          = safeString(context?.clientName);
   const engineerName        = safeString(context?.engineerName);
   const engineerEmail       = safeString(context?.engineerEmail);
   const engineerLicense     = safeString(context?.engineerLicense);
@@ -134,11 +133,7 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   // Affected areas
   const affectedAreas       = safeArrayJoin(context?.affectedAreas);
 
-  // Because the original code has multiple checkboxes for roof types, 
-  // we could build a short descriptive string. But we’ll keep it simple:
-  // "User indicated they have certain roofing categories in the context"
-  // or you can do advanced logic if you like. This is just a placeholder approach.
-  // For demonstration, let's just do:
+  // Summarize roof types from checkboxes
   let roofTypesDetected = '';
   if (context?.roofMetalChecked) {
     roofTypesDetected += 'Metal, ';
@@ -161,8 +156,7 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   if (context?.roofConcreteTileChecked) {
     roofTypesDetected += 'Concrete Tile, ';
   }
-
-  // If empty, keep it blank.
+  // remove trailing comma
   roofTypesDetected = roofTypesDetected.replace(/,\s*$/, '');
 
   // Weather data
@@ -173,7 +167,7 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
     weatherSummary = JSON.stringify(weatherData, null, 2);
   }
 
-  // Large system instruction to keep the generation consistent
+  // Large system instruction
   const bigSystemInstruction = `
 You are an expert forensic engineer generating professional report sections. 
 Use only the data from user inputs; do not invent details that contradict them.
@@ -181,13 +175,13 @@ Use only the data from user inputs; do not invent details that contradict them.
 Key points:
 1. Do NOT invent roofing types if user only specifies certain categories.
 2. Do NOT mention multiple floors if user has not indicated that (avoid referencing an upper floor if not specified).
-3. Keep Date of Loss (${dateOfLoss}) separate from Investigation Date (${investigationDate}).
-4. If weather data is missing or the date is in the future, note that briefly rather than printing "N/A".
+3. Keep Date of Loss (${dateOfLoss}) separate from Inspection Date (${investigationDate}).
+4. If weather data is missing or the date was in the future, note that briefly rather than printing "N/A".
 5. Avoid placeholders like [e.g., ...], [Third Party], etc.
 6. The user’s claim types: ${claimTypeString}.
 7. The indicated roof categories: ${roofTypesDetected}.
 8. The property address: ${address}.
-9. The client name: ${clientName}, property owner: ${propertyOwnerName}.
+9. The property owner (or project name): ${propertyOwnerName} / ${projectName}.
 10. The building type: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
 11. Weather Data Summary: ${weatherSummary}
 `;
@@ -199,7 +193,7 @@ You are writing the "Introduction" for a forensic engineering report.
 - Date of Loss: ${dateOfLoss}
 - Investigation Date: ${investigationDate}
 - Claim Type(s): ${claimTypeString}
-Explain the purpose of the inspection, referencing hail, wind, or other claimed causes.
+Explain the purpose of the inspection (hail, wind, etc.).
 Do not add contradictory roofing details.
 `,
 
@@ -231,34 +225,31 @@ Affected areas: ${affectedAreas}.
 Roof categories indicated: ${roofTypesDetected}.
 Claim type(s): ${claimTypeString}.
 
-Incorporate only what the user indicated. 
-If user said TPO or single-ply was punctured by hail, mention it accordingly. 
-Do not mention asphalt shingles if not indicated, etc.
+Only mention what the user indicated. 
 `,
 
     moisture: `
 "Survey" (Moisture) section.
-If the user indicated interior water intrusion, mention it. Otherwise, be concise.
+If user indicated interior water intrusion, mention it. Otherwise, be concise.
 `,
 
     meteorologist: `
 "Meteorologist Report" section.
 Use the data:
 ${weatherSummary}
-If not available or the date was in the future, note it. 
-Focus on how it might tie into hail/wind claims.
+If not available or date is in the future, note it. 
 `,
 
     conclusions: `
 "Conclusions and Recommendations."
-Summarize your final opinion on the cause(s) of loss. 
+Summarize your final opinion on cause(s) of loss. 
 Propose next steps or repairs if relevant.
 `,
 
     rebuttal: `
 "Rebuttal" section. 
 If no third-party or conflicting reports were indicated, keep minimal. 
-Otherwise, address them if the user provided info.
+Otherwise, address them if user provided details.
 `,
 
     limitations: `
@@ -268,8 +259,7 @@ No placeholders.
 `,
 
     tableofcontents: `
-"Table of Contents" in markdown, with these headings in this order:
-
+"Table of Contents" in markdown, headings in this order:
 1. Opening Letter
 2. Introduction
 3. Authorization and Scope of Investigation
@@ -351,8 +341,7 @@ exports.handler = async function(event) {
 
     // Create chat completion
     const completion = await openai.chat.completions.create({
-      model: 'chatgpt-4o-latest', 
-      // or 'gpt-3.5-turbo' if needed
+      model: 'gpt-3.5-turbo',
       messages: [
         {
           role: 'system',
@@ -360,7 +349,7 @@ exports.handler = async function(event) {
         }
       ],
       temperature: 0.0, // reduce "creative" contradictions
-      max_tokens: 4000
+      max_tokens: 3000
     });
 
     return {
