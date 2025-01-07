@@ -352,6 +352,7 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   const bigSystemInstruction = `
 You are an expert forensic engineer generating professional report sections. 
 Use only the data from user inputs; do not invent details that contradict them.
+Utilize the engineer inputs and create sound, detailed, and objective arguments in defense of substantiating the claim.
 
 Guidelines:
 1. Use formal, technical language
@@ -365,6 +366,7 @@ Guidelines:
 9. For the Table of Contents, use a clean, minimal layout in Markdown. Avoid bullet points and asterisks and hashtags.
 10. Make it so that each section is as long and detailed as possible.
 11. Make all the formatting uniform, with all the main headings the same font in bold, and all the rest of the text smaller font.
+12. Utilize the engineer inputs and create sound, detailed, and objective arguments in defense of substantiating the claim.
 
 Key points:
 1. Do NOT invent roofing types if user only specifies certain categories.
