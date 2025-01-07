@@ -108,8 +108,9 @@ async function getWeatherData(location, dateString) {
 }
 
 /**
- * Build the prompt for each section, instructing GPT to NOT produce a heading
- * with the section name. Instead, it should produce only the body text.
+ * Build the prompt for each section, making sure we avoid
+ * placeholders, contradictory roof info, multi-story references
+ * if it's a single story, etc.
  */
 async function generateSectionPrompt(sectionName, context, weatherData, customInstructions = '') {
   // Extract fields
@@ -133,6 +134,37 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
   // Affected areas
   const affectedAreas       = safeArrayJoin(context?.affectedAreas);
 
+  // Because the original code has multiple checkboxes for roof types, 
+  // we could build a short descriptive string. But we’ll keep it simple:
+  // "User indicated they have certain roofing categories in the context"
+  // or you can do advanced logic if you like. This is just a placeholder approach.
+  // For demonstration, let's just do:
+  let roofTypesDetected = '';
+  if (context?.roofMetalChecked) {
+    roofTypesDetected += 'Metal, ';
+  }
+  if (context?.roofCompChecked) {
+    roofTypesDetected += 'Composition Shingles, ';
+  }
+  if (context?.roofSinglePlyChecked) {
+    roofTypesDetected += 'Single-Ply Membrane, ';
+  }
+  if (context?.roofModBitChecked) {
+    roofTypesDetected += 'Modified Bitumen, ';
+  }
+  if (context?.roofBURChecked) {
+    roofTypesDetected += 'Built Up Roofing (Gravel Ballast), ';
+  }
+  if (context?.roofClayTileChecked) {
+    roofTypesDetected += 'Clay Tile, ';
+  }
+  if (context?.roofConcreteTileChecked) {
+    roofTypesDetected += 'Concrete Tile, ';
+  }
+
+  // If empty, keep it blank.
+  roofTypesDetected = roofTypesDetected.replace(/,\s*$/, '');
+
   // Weather data
   let weatherSummary = '';
   if (weatherData?.note) {
@@ -141,105 +173,129 @@ async function generateSectionPrompt(sectionName, context, weatherData, customIn
     weatherSummary = JSON.stringify(weatherData, null, 2);
   }
 
-  // Large system instruction to keep the generation consistent,
-  // and to prevent GPT from duplicating headings like "Introduction" or "Table of Contents."
+  // Large system instruction to keep the generation consistent
   const bigSystemInstruction = `
 You are an expert forensic engineer generating professional report sections. 
-IMPORTANT: Do NOT produce an extra heading at the top saying "Introduction," "Table of Contents," etc.
-Because the code will insert that heading. 
-So only produce the BODY TEXT for this section. Avoid repeating the section name as a heading.
+Use only the data from user inputs; do not invent details that contradict them.
 
 Key points:
-1. Avoid placeholders like [e.g., ...], [N/A], or repeated headings.
-2. Use the user’s data only. 
-3. If date is in the future or weather data is missing, note it briefly but do not say "N/A."
-4. The user’s claim type(s): ${claimTypeString}.
-5. Address: ${address}.
-6. Building details: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
-7. Weather data summary: ${weatherSummary}.
-8. Do not produce a heading that duplicates the section name. Just produce the content for the section.
+1. Do NOT invent roofing types if user only specifies certain categories.
+2. Do NOT mention multiple floors if user has not indicated that (avoid referencing an upper floor if not specified).
+3. Keep Date of Loss (${dateOfLoss}) separate from Investigation Date (${investigationDate}).
+4. If weather data is missing or the date is in the future, note that briefly rather than printing "N/A".
+5. Avoid placeholders like [e.g., ...], [Third Party], etc.
+6. The user’s claim types: ${claimTypeString}.
+7. The indicated roof categories: ${roofTypesDetected}.
+8. The property address: ${address}.
+9. The client name: ${clientName}, property owner: ${propertyOwnerName}.
+10. The building type: ${propertyType}, age: ${propertyAge}, use: ${currentUse}, sq ft: ${squareFootage}.
+11. Weather Data Summary: ${weatherSummary}
 `;
 
-  // The base prompts remain the same, but we remove any instruction to produce a heading.
   const basePrompts = {
     introduction: `
-You are writing the body text for "Introduction." 
-Do NOT include the word "Introduction" as a heading. 
-Focus on the property at ${address}, the date of loss ${dateOfLoss}, the inspection date ${investigationDate}, 
-and the reason for the inspection (claim type: ${claimTypeString}).
+You are writing the "Introduction" for a forensic engineering report.
+- Address: ${address}
+- Date of Loss: ${dateOfLoss}
+- Investigation Date: ${investigationDate}
+- Claim Type(s): ${claimTypeString}
+Explain the purpose of the inspection, referencing hail, wind, or other claimed causes.
+Do not add contradictory roofing details.
 `,
 
     authorization: `
-You are writing the body text for "Authorization and Scope of Investigation."
-Do NOT include that heading in your text. 
-Summarize who authorized the investigation, the scope, major tasks, references if any.
+You are writing the "Authorization and Scope of Investigation" section.
+Include:
+1) Who authorized it (e.g., property owner or law firm).
+2) The scope of work (site visit, photos, etc.).
+3) Summarize major tasks.
+4) Note any references if available.
 `,
 
     background: `
-You are writing the body text for "Background Information."
-Do NOT include a heading. 
-Relevant details:
-- Property Type: ${propertyType}, Age: ${propertyAge}, Construction: ${constructionType}
-- Current Use: ${currentUse}, Square Footage: ${squareFootage}, etc.
-- Project Name: ${projectName}, Property Owner: ${propertyOwnerName}
+You are writing "Background Information."
+Include relevant details:
+- Property Type: ${propertyType}
+- Age: ${propertyAge}
+- Construction Type: ${constructionType}
+- Current Use: ${currentUse}
+- Square Footage: ${squareFootage}
+- Project Name: ${projectName}
+- Property Owner: ${propertyOwnerName}
+No placeholders or contradictory info.
 `,
 
     observations: `
-You are writing the body text for "Site Observations and Analysis."
-Do NOT include a heading. 
-Affected areas: ${affectedAreas}, claim type(s): ${claimTypeString}.
-Mention only user-indicated details.
+You are writing "Site Observations and Analysis."
+Affected areas: ${affectedAreas}.
+Roof categories indicated: ${roofTypesDetected}.
+Claim type(s): ${claimTypeString}.
+
+Incorporate only what the user indicated. 
+If user said TPO or single-ply was punctured by hail, mention it accordingly. 
+Do not mention asphalt shingles if not indicated, etc.
 `,
 
     moisture: `
-You are writing the body text for "Survey" (Moisture) section.
-Do NOT include a heading. 
-Discuss moisture presence or absence. 
+"Survey" (Moisture) section.
+If the user indicated interior water intrusion, mention it. Otherwise, be concise.
 `,
 
     meteorologist: `
-You are writing the body text for "Meteorologist Report."
-Do NOT include a heading. 
-Use data from: ${weatherSummary}.
+"Meteorologist Report" section.
+Use the data:
+${weatherSummary}
+If not available or the date was in the future, note it. 
+Focus on how it might tie into hail/wind claims.
 `,
 
     conclusions: `
-You are writing the body text for "Conclusions and Recommendations."
-Do NOT include a heading. 
-Summarize final opinions on the cause of loss, recommended steps, etc.
+"Conclusions and Recommendations."
+Summarize your final opinion on the cause(s) of loss. 
+Propose next steps or repairs if relevant.
 `,
 
     rebuttal: `
-You are writing the body text for "Rebuttal."
-Do NOT include a heading. 
-If no conflicting reports are indicated, keep it minimal.
+"Rebuttal" section. 
+If no third-party or conflicting reports were indicated, keep minimal. 
+Otherwise, address them if the user provided info.
 `,
 
     limitations: `
-You are writing the body text for "Limitations."
-Do NOT include a heading. 
-Standard disclaimers about scope, data reliance, etc.
+"Limitations" section.
+Typical disclaimers about data reliance, scope boundaries, site access, etc.
+No placeholders.
 `,
 
     tableofcontents: `
-You are writing the body text for "Table of Contents."
-Do NOT include a heading that says "Table of Contents" again. 
-Just list or outline the sections in a minimal way.
+"Table of Contents" in markdown, with these headings in this order:
+
+1. Opening Letter
+2. Introduction
+3. Authorization and Scope of Investigation
+4. Background Information
+5. Site Observations and Analysis
+6. Survey
+7. Meteorologist Report
+8. Conclusions and Recommendations
+9. Rebuttal
+10. Limitations
 `,
 
     openingletter: `
-You are writing the body text for "Opening Letter."
-Do NOT include a heading. 
-Include a brief greeting, date of loss, inspection date, claim type(s), address, 
-and sign-off with the engineer’s name/license/email/phone.
+"Opening Letter" for the final report.
+Include:
+- Date of Loss: ${dateOfLoss}
+- Investigation Date: ${investigationDate}
+- Claim Type(s): ${claimTypeString}
+- Address: ${address}
+- Brief greeting
+- Signature block: ${engineerName}, License: ${engineerLicense}, Email: ${engineerEmail}, Phone: ${engineerPhone}
 `
   };
 
   const normalizedSection = (sectionName || '').trim().toLowerCase();
-  const fallbackPrompt = `
-Write the BODY TEXT for section: ${sectionName}, 
-without repeating the section name as a heading at the top.
-`;
+  const fallbackPrompt = `Write a professional section: ${sectionName}, using only user inputs.`;
 
   const basePrompt = basePrompts[normalizedSection] || fallbackPrompt;
 
@@ -252,7 +308,7 @@ without repeating the section name as a heading at the top.
   const fullPrompt = `
 ${bigSystemInstruction}
 
-Now produce the body text for the section named "${sectionName}". 
+Now produce the "${sectionName}" section.
 
 ${finalPrompt}
 `;
@@ -295,8 +351,8 @@ exports.handler = async function(event) {
 
     // Create chat completion
     const completion = await openai.chat.completions.create({
-      model: 'chatgpt-4o-latest',
-      // or 'gpt-3.5-turbo' if you prefer it
+      model: 'gpt-3.5-turbo', 
+      // or 'gpt-4' if available
       messages: [
         {
           role: 'system',
@@ -304,7 +360,7 @@ exports.handler = async function(event) {
         }
       ],
       temperature: 0.0, // reduce "creative" contradictions
-      max_tokens: 4000
+      max_tokens: 3000
     });
 
     return {
