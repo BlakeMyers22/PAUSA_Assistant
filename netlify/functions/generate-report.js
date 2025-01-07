@@ -367,6 +367,7 @@ Guidelines:
 10. Make it so that each section is as long and detailed as possible.
 11. Make all the formatting uniform, with all the main headings the same font in bold, and all the rest of the text smaller font.
 12. Utilize the engineer inputs and create sound, detailed, and objective arguments in defense of substantiating the claim.
+13. Be lenghty and detailed throughout.
 
 Key points:
 1. Do NOT invent roofing types if user only specifies certain categories.
@@ -544,7 +545,7 @@ exports.handler = async function(event) {
           content: prompt
         }
       ],
-      temperature: 0.0, // reduce "creative" contradictions
+      temperature: 0.2, // reduce "creative" contradictions
       max_tokens: 4000
     });
 
